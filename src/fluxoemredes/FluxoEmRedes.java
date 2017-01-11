@@ -52,33 +52,53 @@ public class FluxoEmRedes {
         double[] vazaoMax = new double[numUsinas];
         double demanda = 2500;
         
-        FluxoEmRede fluxoEmRedes = new FluxoEmRede(numUsinas, numIntervalos, rede1, volumeMin, volumeMax, vazaoMin,vazaoMax,demanda);
+        FluxoEmRede fluxoEmRedes = new FluxoEmRede(numUsinas, numIntervalos, rede2, volumeMin, volumeMax, vazaoMin,vazaoMax,demanda);
         for(int i = 0; i<1;i++){
             System.out.println("i : "+(i+1));
-            System.out.println("======================== FPH ========================");
-            fluxoEmRedes.ParticaoEPAFPH();
-            System.out.println("====================== EPA-TEC ======================"); //53
-            fluxoEmRedes.ParticaoEPATEC();
-            System.out.println("============== IDENTIFICAÇÃO DE CICLOS ===============");
-            fluxoEmRedes.detectarCiclos();
-            System.out.println("quantidade de ciclos = " + fluxoEmRedes.getCiclos().size());
-            fluxoEmRedes.imprimeCiclos();
-            System.out.println("========= DIREÇÃO DE CAMINHADA SUPER BÁSICOS ==========");
-            fluxoEmRedes.DirecaoDeCaminhadaArcosSuperBasicos();
-            fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
-            System.out.println("========= PROJEÇÃ0 DE CAMINHADA SUPER BÁSICOS =========");
-            fluxoEmRedes.ProjecaoDeCaminhadaArcosSuperBasicos();
-            fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
+            for (int j = 0; j < fluxoEmRedes.numUsinas; j++) {
+                System.out.println("USINA " + j);
+                System.out.println("======================== FPH ========================");
+                fluxoEmRedes.ParticaoEPAFPH();
+                System.out.println("====================== EPA-TEU ======================");
+                fluxoEmRedes.ParticaoEPATEU(j);
+                fluxoEmRedes.imprimeMIBV();
+                fluxoEmRedes.imprimeArcosSuperBasicos();
+                fluxoEmRedes.imprimeArcosBasicos();
+
+    //            System.out.println("====================== EPA-TEC ======================"); //53
+    //            fluxoEmRedes.ParticaoEPATEC();
+                System.out.println("============== IDENTIFICAÇÃO DE CICLOS ===============");
+                fluxoEmRedes.detectarCiclos();
+                System.out.println("quantidade de ciclos = " + fluxoEmRedes.getCiclos().size());
+                fluxoEmRedes.imprimeCiclos();
+                System.out.println("========= DIREÇÃO DE CAMINHADA SUPER BÁSICOS ==========");
+                fluxoEmRedes.DirecaoDeCaminhadaArcosSuperBasicos();
+                fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
+                System.out.println("========= PROJEÇÃ0 DE CAMINHADA SUPER BÁSICOS =========");
+                fluxoEmRedes.ProjecaoDeCaminhadaArcosSuperBasicos();
+                fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
+                System.out.println("============= MIVB ================");
+                fluxoEmRedes.imprimeMIBV();
+                System.out.println("======= DIREÇÃO DE CAMINHADA DOS ARCOS BÁSICOS ========");
+                fluxoEmRedes.DirecaoDeCaminhadaArcosBasicos();
+                fluxoEmRedes.imprimeDirecaoCaminhadaArcosBasicos();
+                System.out.println("================= PASSO MÁXIMO =====================");
+                fluxoEmRedes.PassoMaximoDoCiclo();
+                fluxoEmRedes.imprimeMatrizPassosMaximos();
+                System.out.println(fluxoEmRedes.passoMaximo);
+                System.out.println("================== PARTÍCULA ===================");
+                fluxoEmRedes.imprimeParticula();
+                System.out.println("=========== ATUALIZAÇÃO DA REDE ================");
+                fluxoEmRedes.AtualizarRede();
+                System.out.println("================== PARTÍCULA ===================");
+                fluxoEmRedes.imprimeParticula();
+                System.out.println("******************************************************");
+            }
             
-           
-//            fluxoEmRedes.detectarCiclos();
-//            fluxoEmRedes.DirecaoDeCaminhadaArcosSuperBasicos();
-//            fluxoEmRedes.ProjecaoDeCaminhadaArcosSuperBasicos();
-//            fluxoEmRedes.DirecaoDeCaminhadaArcosBasicos();
-//            fluxoEmRedes.PassoMaximoDoCiclo();
-//            fluxoEmRedes.Atualizar();
+            System.out.println();
         }
-        System.out.println("");
+        
+        
 //        MVB[0][0] = 1;
 //        MVB[0][1] = 0;
 //        MVB[0][2] = 0;

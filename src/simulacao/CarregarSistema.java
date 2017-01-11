@@ -557,13 +557,13 @@ public void testarSimulacaoUsinasReservatorio(SimulacaoOperacaoEnergeticaPSO sis
 				
 				double[] volumes=new double[numUsina];	
 				
-//				volumes[0]=17190;
-//				volumes[1]=17027;
-//				volumes[2]=12540;
+				volumes[0]=17190;
+				volumes[1]=17027;
+				volumes[2]=12540;
 
-                                volumes[0]=16190;
-				volumes[1]=16027;
-				volumes[2]=11540;
+//                                volumes[0]=16190;
+//				volumes[1]=16027;
+//				volumes[2]=11540;
 				
 				sistema.definirVolumeInicial(volumes);
 	}
