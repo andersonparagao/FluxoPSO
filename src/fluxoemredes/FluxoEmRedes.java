@@ -60,11 +60,15 @@ public class FluxoEmRedes {
             System.out.println("====================== EPA-TEC ======================"); //53
             fluxoEmRedes.ParticaoEPATEC();
             System.out.println("============== IDENTIFICAÇÃO DE CICLOS ===============");
-//            fluxoEmRedes.detectarCiclos();
-//            System.out.println("quantidade de ciclos = " + fluxoEmRedes.getCiclos().size());
-//            fluxoEmRedes.imprimeCiclos();
-//            System.out.println("=============== DIREÇÃO DE CAMINHADA ================");
-//            fluxoEmRedes.DirecaoDeCaminhadaArcosSuperBasicos();
+            fluxoEmRedes.detectarCiclos();
+            System.out.println("quantidade de ciclos = " + fluxoEmRedes.getCiclos().size());
+            fluxoEmRedes.imprimeCiclos();
+            System.out.println("========= DIREÇÃO DE CAMINHADA SUPER BÁSICOS ==========");
+            fluxoEmRedes.DirecaoDeCaminhadaArcosSuperBasicos();
+            fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
+            System.out.println("========= PROJEÇÃ0 DE CAMINHADA SUPER BÁSICOS =========");
+            fluxoEmRedes.ProjecaoDeCaminhadaArcosSuperBasicos();
+            fluxoEmRedes.imprimeDirecaoCaminhadaSuperBasicos();
             
            
 //            fluxoEmRedes.detectarCiclos();
