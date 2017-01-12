@@ -507,7 +507,7 @@ public class FluxoEmRede {
         int menor = getMenorCustoMarginal(IntervalosHorizonte);
         System.out.println("\nMaior = " + maior);
         System.out.println("Menor = " + menor + "\n");
-        
+
         int direita = maior;
         int esquerda = menor;
         if (maior < menor) {
@@ -569,7 +569,7 @@ public class FluxoEmRede {
     private int getMaiorCustoMarginal(ArrayList<IntervaloDeHorizonte> intervalos) {
         int indice = 0;
         for (int i = 1; i < intervalos.size(); i++) {
-            if (intervalos.get(i).getGeracaoComplementar() > intervalos.get(indice).getGeracaoComplementar()) {
+            if (intervalos.get(i).getGeracaoHidraulica() < intervalos.get(indice).getGeracaoHidraulica()) {
                 indice = i;
             }
         }
@@ -607,10 +607,12 @@ public class FluxoEmRede {
                     direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio * (1000000.0 / 2628000.0);
                 }
             } else //se o arco superbasico for de volume
-            if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
-            } else {
-                direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio * (1000000.0 / 2628000.0);
+            {
+                if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
+                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
+                } else {
+                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio * (1000000.0 / 2628000.0);
+                }
             }
         }
     }
@@ -635,7 +637,6 @@ public class FluxoEmRede {
     }
 
     public void DirecaoDeCaminhadaArcosBasicos() {
-        double fatorConversaoVAVO = 1000000.0 / 2628000.0;
         double direcaoSuperBasico;
         for (int i = 0; i < arcosBasicos.size(); i++) {
             int indiceUsina = arcosBasicos.get(i).getOrigem()[0];
@@ -659,18 +660,19 @@ public class FluxoEmRede {
                     if (MIVB[indiceUsina][indiceIntervalo] == 1) {
                         //verificando se o arco superbasico é de montante
                         if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                            //direcaoSuperBasico = (SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB]*fatorConversaoVAVO); 
                             direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] = direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] + (SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB]);
                         } else {
                             direcaoSuperBasico = (SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos]);
                             direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] = direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] + direcaoSuperBasico;
                         }
                     } else //verificando se o arco superbasico é de montante
-                    if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                        direcaoDeCaminhada[indiceUsina][indiceIntervalo] = direcaoDeCaminhada[indiceUsina][indiceIntervalo] + SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB];
-                    } else {
-                        direcaoSuperBasico = (SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][numIntervalos + indiceIntervaloSB]);
-                        direcaoDeCaminhada[indiceUsina][indiceIntervalo] = direcaoDeCaminhada[indiceUsina][indiceIntervalo] + direcaoSuperBasico;
+                    {
+                        if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
+                            direcaoDeCaminhada[indiceUsina][indiceIntervalo] = direcaoDeCaminhada[indiceUsina][indiceIntervalo] + SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB];
+                        } else {
+                            direcaoSuperBasico = (SinalDeConcordanciaDoArcoSB * direcaoDeCaminhada[indiceUsinaSB][numIntervalos + indiceIntervaloSB]);
+                            direcaoDeCaminhada[indiceUsina][indiceIntervalo] = direcaoDeCaminhada[indiceUsina][indiceIntervalo] + direcaoSuperBasico;
+                        }
                     }
                 }
 
@@ -678,7 +680,6 @@ public class FluxoEmRede {
         }
     }
 
-    
     public void PassoMaximoDoCiclo() {
         matrizPassosMaximos = new double[numUsinas][numIntervalos * 2];
         PassoMaximoBasicoSuperBasico();
@@ -730,14 +731,16 @@ public class FluxoEmRede {
                     }
                 } else//caso em que o arco basico é montante
                 //verificando se o passo maximo do arco basico ja foi calculado
-                 if (matrizPassosMaximos[indiceUsina][indiceIntervalo] == 0) {
+                {
+                    if (matrizPassosMaximos[indiceUsina][indiceIntervalo] == 0) {
                         if (direcaoDeCaminhada[indiceUsina][indiceIntervalo] < 0) {
-                            matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMin[indiceUsina] - rede[indiceUsina][indiceIntervalo])  / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
+                            matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMin[indiceUsina] - rede[indiceUsina][indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
                         } else if (direcaoDeCaminhada[indiceUsina][indiceIntervalo] > 0) {
-                            matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMax[indiceUsina] - rede[indiceUsina][indiceIntervalo])  / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
+                            matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMax[indiceUsina] - rede[indiceUsina][indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
 
                         }
                     }
+                }
             }
         }
     }
@@ -764,7 +767,6 @@ public class FluxoEmRede {
         return false;
     }
 
-    
     public void AtualizarRede() {
         for (int i = 0; i < rede.length; i++) {
             // atualização dos volumes
@@ -773,13 +775,12 @@ public class FluxoEmRede {
             }
             // atualização das defluências
             for (int j = numIntervalos; j < rede[0].length; j++) {
-                rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * (2628000.0 / 1000000.0);
-
+                //rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * (2628000.0 / 1000000.0);
+                rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * (1000000.0/2628000.0);
             }
         }
     }
 
-    
     public void imprimeMIBV() {
         System.out.println("Matriz Indicadora de Variáveis Básicas");
         for (int i = 0; i < MIVB.length; i++) {
