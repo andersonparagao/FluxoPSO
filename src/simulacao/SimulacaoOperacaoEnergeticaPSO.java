@@ -251,7 +251,8 @@ public class SimulacaoOperacaoEnergeticaPSO {
 //				if(geracao==0){
 //					custo=custo+demanda[i]/2;
 //				}
-				System.out.println("intervalo " + i + " geracao " + geracao);
+				//System.out.println("intervalo " + i + " geracao " + geracao);
+                                System.out.println(String.format("%.10f", geracao));
 			} else{
 				geracao=SistemaHidroeletrico.Executar(i, demanda[i], nos[i],nos[i-1],HorizontePlanejamento.getIntervalos().get(i));
 				HorizontePlanejamento.getIntervalos().get(i).setGeracaoHidraulica(geracao);
@@ -261,7 +262,8 @@ public class SimulacaoOperacaoEnergeticaPSO {
 //				if(geracao==0){
 //					custo=custo+demanda[i]/2;
 //				}
-				System.out.println("intervalo " +i+" geracao "+geracao);
+//				System.out.println("intervalo " +i+" geracao "+geracao);
+                                System.out.println(String.format("%.10f", geracao));
 			}
                 }
 		return custo/2;

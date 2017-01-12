@@ -30,8 +30,8 @@ public class Teste {
 //		for (int i = 0; i < dimensao; i++) {
 //		System.out.println(" melhor " + i +" -> "+melhor[i]);	
 //		}
-            pso = new PSO(demanda,tamPopulacao,numUsinas,numIntervalos,iteracoes,c1,c2);
-            double[][] retorno = pso.executar();
+         //   pso = new PSO(demanda,tamPopulacao,numUsinas,numIntervalos,iteracoes,c1,c2);
+          //  double[][] retorno = pso.executar();
 		for(int i=0;i<numUsinas;i++){
                     for(int j = 0;j<numIntervalos;j++)
                         System.out.println();

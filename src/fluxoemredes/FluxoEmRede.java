@@ -814,6 +814,17 @@ public class FluxoEmRede {
         }
         System.out.println();
     }
+    
+//    public void imprimeParticula() {
+//        System.out.println("Partícula");
+//        for (int i = 0; i < rede.length; i++) {
+//            System.out.println();
+//            for (int j = 0; j < rede[0].length; j++) {
+//                System.out.println(String.format("%.10f", rede[i][j]));
+//            }
+//        }
+//        System.out.println();
+//    }
 
     public void imprimeArcosBasicos() {
         System.out.println("Arcos Básicos");
