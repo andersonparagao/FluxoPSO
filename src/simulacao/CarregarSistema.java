@@ -446,15 +446,14 @@ public void testarSimulacaoUsinasReservatorio(SimulacaoOperacaoEnergeticaPSO sis
 			String linha = lerArq.readLine(); 
 			int i=0;
 			// l� a primeira linha // a vari�vel "linha" recebe o valor "null" quando o processo // de repeti��o atingir o final do arquivo texto 
-			while (linha != null) {
+			while (i < numIntervalos) {
 				//System.out.printf("%s\n", linha); 
 				//System.out.println("i = "+ i);
                                 
 				afluencia[i][0]=Double.parseDouble(linha);
 				//System.out.println(vetor[i]);
 				i++;
-                                if(i==3)
-                                    break;
+                                
 				linha = lerArq.readLine(); // l� da segunda at� a �ltima linha
 				} arq.close();
 				} catch (IOException e) { 
@@ -470,14 +469,14 @@ public void testarSimulacaoUsinasReservatorio(SimulacaoOperacaoEnergeticaPSO sis
 					String linha = lerArq.readLine(); 
 					int i=0;
 					// l� a primeira linha // a vari�vel "linha" recebe o valor "null" quando o processo // de repeti��o atingir o final do arquivo texto 
-					while (linha != null) {
+					while (i < numIntervalos) {
 						//System.out.printf("%s\n", linha); 
 						//System.out.println("i = "+ i);
 						afluencia[i][1]=Double.parseDouble(linha);
 						//System.out.println(vetor[i]);
 						i++;
-                                                if(i==3)
-                                                    break;
+//                                                if(i==3)
+//                                                    break;
 						linha = lerArq.readLine(); // l� da segunda at� a �ltima linha
 						} arq.close();
 						} catch (IOException e) { 
@@ -494,14 +493,14 @@ public void testarSimulacaoUsinasReservatorio(SimulacaoOperacaoEnergeticaPSO sis
 					String linha = lerArq.readLine(); 
 					int i=0;
 					// l� a primeira linha // a vari�vel "linha" recebe o valor "null" quando o processo // de repeti��o atingir o final do arquivo texto 
-					while (linha != null) {
+					while (i < numIntervalos) {
 						//System.out.printf("%s\n", linha); 
 						//System.out.println("i = "+ i);
 						afluencia[i][2]=Double.parseDouble(linha);
 						//System.out.println(vetor[i]);
 						i++;
-                                                if(i==3)
-                                                    break;    
+//                                                if(i==3)
+//                                                    break;    
 						linha = lerArq.readLine(); // l� da segunda at� a �ltima linha
 						} arq.close();
 						} catch (IOException e) { 

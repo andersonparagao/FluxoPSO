@@ -33,6 +33,7 @@ public class FluxoEmRede {
     ArrayList<Arco> arcosBasicos;
     ArrayList<Arco> superBasicos;
     ArrayList<Ciclo> ciclos;
+    double conversaoVolumeVazao = 1000000.0/2628000.0;
 
     int[] usinasJusante;
     double passoMaximo;  //mudei o nome desta variável
@@ -604,14 +605,14 @@ public class FluxoEmRede {
                 if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
                     direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = -numeroAleatorio;
                 } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio * (1000000.0 / 2628000.0);
+                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio * conversaoVolumeVazao;
                 }
             } else //se o arco superbasico for de volume
             {
                 if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
                     direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
                 } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio * (1000000.0 / 2628000.0);
+                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio * conversaoVolumeVazao;
                 }
             }
         }
@@ -707,9 +708,9 @@ public class FluxoEmRede {
                     matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMax[indiceUsina] - rede[indiceUsina][indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
                 }
             } else if (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] < 0) {
-                matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMin[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * (1000000.0 / 2628000.0) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
+                matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMin[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * conversaoVolumeVazao / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
             } else if (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] > 0) {
-                matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMax[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * (1000000.0 / 2628000.0) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
+                matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMax[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * conversaoVolumeVazao / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
             }
         }
 
@@ -723,9 +724,9 @@ public class FluxoEmRede {
                     //verificando se o passo maximo do arco basico ja foi calculado
                     if (matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] == 0) {
                         if (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] < 0) {
-                            matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMin[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * (1000000.0 / 2628000.0) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
+                            matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMin[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * conversaoVolumeVazao / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
                         } else if (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] > 0) {
-                            matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMax[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * (1000000.0 / 2628000.0) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
+                            matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMax[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) * conversaoVolumeVazao / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
 
                         }
                     }
@@ -776,7 +777,7 @@ public class FluxoEmRede {
             // atualização das defluências
             for (int j = numIntervalos; j < rede[0].length; j++) {
                 //rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * (2628000.0 / 1000000.0);
-                rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * (1000000.0/2628000.0);
+                rede[i][j] = rede[i][j] + direcaoDeCaminhada[i][j] * passoMaximo * conversaoVolumeVazao;
             }
         }
     }
@@ -814,6 +815,26 @@ public class FluxoEmRede {
         }
         System.out.println();
     }
+    
+    
+//    public void imprimeParticula() {
+//        System.out.println("Partícula");
+//        for (int i = 0; i < rede.length; i++) {
+//            if (i != 0) {
+//                System.out.println("}");
+//            } else {
+//                System.out.println("{");
+//            }
+//            for (int j = 0; j < rede[0].length/2; j++) {
+//                if (j == rede[0].length - 1) {
+//                    System.out.print(rede[i][j] + "}");
+//                } else {
+//                    System.out.print(rede[i][j] + ", ");
+//                }
+//            }
+//        }
+//        System.out.println();
+//    }
     
 //    public void imprimeParticula() {
 //        System.out.println("Partícula");
