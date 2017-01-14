@@ -3,9 +3,9 @@ package PsoGeracaoHidroeletrica;
 import fluxoemredes.Arco;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import simulacao.CarregarSistema;
 import simulacao.SimulacaoOperacaoEnergeticaPSO;
 
 public class ParticulaPSO {
@@ -23,7 +23,7 @@ public class ParticulaPSO {
     
 
 
-    public ParticulaPSO(int numUsinas, int numIntervalos, double[] xminvazao, double[] xmaxvazao, double[] xminvolume, double[] xmaxvolume, SimulacaoOperacaoEnergeticaPSO simulacao, int iteracaoFluxo) {
+    public ParticulaPSO(int numUsinas, int numIntervalos, double[] xminvazao, double[] xmaxvazao, double[] xminvolume, double[] xmaxvolume, SimulacaoOperacaoEnergeticaPSO simulacao) {
         //a variavel volume vazao é porque as usinas terao como valores os volumes finais e vazaoes defluentes em sequencia
         posicao = new double[numUsinas][numIntervalos * 2];
         velocidade = new double[numUsinas][numIntervalos * 2];
@@ -53,16 +53,16 @@ public class ParticulaPSO {
         for (int j = 0; j < numUsinas; j++) {
             for (int k = 0; k < numIntervalos; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]) / iteracaoFluxo;
-                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]) / iteracaoFluxo;
+                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]);
+                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]);
             }
         }
 
         for (int j = 0; j < numUsinas; j++) {
             for (int k = numIntervalos; k < numIntervalos * 2; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]) / iteracaoFluxo;
-                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]) / iteracaoFluxo;
+                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]);
+                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]);
             }
         }
         
@@ -84,10 +84,10 @@ public class ParticulaPSO {
         return volumeinicial;
     }
 
-    public void AtualizarVelocidade(double c1, double c2, double r1, double r2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+    public List AtualizarVelocidade(double c1, double c2, double r1, double r2, double[][] gBest, List<Arco> arcosSuperBasicos) {
         int numUsinas = posicaoMin.length;
-        int numIntervalos = posicao[0].length;
-        
+        int numIntervalos = posicao[0].length/2;
+        List<Double> direcaoCaminhadaArcosSuperBasico = new ArrayList<>();
         
         for (int i = 0; i < arcosSuperBasicos.size(); i++) {
             int linhaOrigem = arcosSuperBasicos.get(i).getOrigem()[0];
@@ -96,31 +96,47 @@ public class ParticulaPSO {
             int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
             
             // se o arco superbásico for um arco de volume
+//            if(linhaOrigem == linhaDestino){
+//                velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]);
+//            } else {
+//                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]);
+//            }
+              
+            // se o arco superbásico for um arco de volume
             if(linhaOrigem == linhaDestino){
+                System.out.println("c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
+                System.out.println("c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
+                System.out.println("velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem])));
+                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
                 velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]);
             } else {
-                velocidade[linhaOrigem][colunaOrigem + (numIntervalos/2)] = velocidade[linhaOrigem][colunaOrigem + (numIntervalos/2)] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + (numIntervalos/2)]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + (numIntervalos/2)]);
+                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
+                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]);
+            }
+        }
+        
+        return direcaoCaminhadaArcosSuperBasico;
+    }
+
+    // quem vai atualizar vai ser o Fluxo em Rede
+    public void AtualizarPosicao() {
+        int numUsinas = posicao.length;
+        int numIntervalos = posicao[0].length;
+        for (int i = 0; i < numUsinas; i++) {
+            for (int j = 0; j < numIntervalos; j++) {
+                posicao[i][j] = posicao[i][j] + velocidade[i][j];
+                if (posicao[i][j] > posicaoMax[i][j]) {
+                    posicao[i][j] = posicaoMax[i][j];
+                }
+                if (posicao[i][j] < posicaoMin[i][j]) {
+                    posicao[i][j] = posicaoMin[i][j];
+                }
             }
         }
     }
 
-    // quem vai atualizar vai ser o Fluxo em Rede
-//    public void AtualizarPosicao() {
-//        int numUsinas = posicaoMin.length;
-//        int numIntervalos = posicaoMin[0].length;
-//        for (int i = 0; i < numUsinas; i++) {
-//            for (int j = 0; j < numIntervalos; j++) {
-//                posicao[i][j] = posicao[i][j] + velocidade[i][j];
-//                if (posicao[i][j] > posicaoMax[i][j]) {
-//                    posicao[i][j] = posicaoMax[i][j];
-//                }
-//                if (posicao[i][j] < posicaoMin[i][j]) {
-//                    posicao[i][j] = posicaoMin[i][j];
-//                }
-//            }
-//        }
-//    }
-
+    
+    
     public void AvaliarParticula() {
         int numIntervalos = posicaoMin[0].length/2;
         int numUsinas = posicaoMin.length;
@@ -141,9 +157,10 @@ public class ParticulaPSO {
      * Também irá inicializar a velocidade
      **/
     public void inicializaParticula(){
+        Random r = new Random();
         for (int i = 0; i < posicao.length; i++) {
             for (int j = 0; j < posicao[0].length/2; j++) {
-                posicao[i][j] = posicaoMax[i][j];
+                posicao[i][j] = posicaoMax[i][j] + posicaoMax[i][j]*0.1*r.nextDouble();
             }
         }
         
