@@ -96,22 +96,12 @@ public class ParticulaPSO {
             int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
             
             // se o arco superbásico for um arco de volume
-//            if(linhaOrigem == linhaDestino){
-//                velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]);
-//            } else {
-//                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]);
-//            }
-              
-            // se o arco superbásico for um arco de volume
             if(linhaOrigem == linhaDestino){
-                System.out.println("c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-                System.out.println("c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-                System.out.println("velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) = " + (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem])));
                 direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-                velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]);
+                velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]); 
             } else {
-                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
-                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + (numIntervalos/2)] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]);
+                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
+                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]); 
             }
         }
         
@@ -119,17 +109,20 @@ public class ParticulaPSO {
     }
 
     // quem vai atualizar vai ser o Fluxo em Rede
-    public void AtualizarPosicao() {
+    public void AtualizarPosicao(double[][] matrizFluxo) {
         int numUsinas = posicao.length;
         int numIntervalos = posicao[0].length;
         for (int i = 0; i < numUsinas; i++) {
             for (int j = 0; j < numIntervalos; j++) {
-                posicao[i][j] = posicao[i][j] + velocidade[i][j];
-                if (posicao[i][j] > posicaoMax[i][j]) {
-                    posicao[i][j] = posicaoMax[i][j];
-                }
-                if (posicao[i][j] < posicaoMin[i][j]) {
-                    posicao[i][j] = posicaoMin[i][j];
+                if(matrizFluxo[i][j] != 0){
+                    velocidade[i][j] = matrizFluxo[i][j];
+                    posicao[i][j] = posicao[i][j] + velocidade[i][j];
+                    if (posicao[i][j] > posicaoMax[i][j]) {
+                        posicao[i][j] = posicaoMax[i][j];
+                    }
+                    if (posicao[i][j] < posicaoMin[i][j]) {
+                        posicao[i][j] = posicaoMin[i][j];
+                    }
                 }
             }
         }
@@ -160,7 +153,7 @@ public class ParticulaPSO {
         Random r = new Random();
         for (int i = 0; i < posicao.length; i++) {
             for (int j = 0; j < posicao[0].length/2; j++) {
-                posicao[i][j] = posicaoMax[i][j] + posicaoMax[i][j]*0.1*r.nextDouble();
+                posicao[i][j] = posicaoMax[i][j];
             }
         }
         
@@ -249,24 +242,9 @@ public class ParticulaPSO {
             }
         }
 
-//        // Exibição dos volumes
-//        for (int i = 0; i < velocidadesIniciais.length; i++) {
-//            System.out.println("");
-//            for (int j = 0; j < (posicao[0].length/2); j++) {
-//                System.out.print(velocidadesIniciais[i][j] + ", ");
-//            }
-//        }
-//
-//        // Exibição das defluências
-//        System.out.println();
-//        for (int i = 0; i < velocidadesIniciais.length; i++) {
-//            System.out.println("");
-//            for (int j = (posicao[0].length/2); j < velocidadesIniciais[0].length; j++) {
-//                System.out.print(velocidadesIniciais[i][j] + ", ");
-//            }
-//        }
         return velocidadesIniciais;
     }
+
     
     
     public void imprimePosicao(){

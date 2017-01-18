@@ -46,17 +46,14 @@ public class PSO {
         }
     }
 
-    public List AtualizarVelocidade(List<List<Arco>> arcosSuperBasicos) {
+    public List AtualizarVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos) {
         Random geradorAleatorior1 = new Random();
         r1 = geradorAleatorior1.nextDouble();
         Random geradorAleatorior2 = new Random();
         r2 = geradorAleatorior2.nextDouble();
-        List<List<Double>> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
+        List<Double> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
 
-        for (int i = 0; i < enxame.length; i++) {
-            List<Double> direcaoCaminhadaSuperBasicoI = enxame[i].AtualizarVelocidade(c1, c2, r1, r2, gBest.getPosicao(), arcosSuperBasicos.get(i));
-            direcaoCaminhadaArcosSuperBasicos.add(direcaoCaminhadaSuperBasicoI);
-        }
+        direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].AtualizarVelocidade(c1, c2, r1, r2, gBest.getPosicao(), arcosSuperBasicos);
         
         return direcaoCaminhadaArcosSuperBasicos;
     }
@@ -68,15 +65,14 @@ public class PSO {
             enxame[i] = particula;
         }
     }
-
-    // não vamos usar agora, quem vai atualizar a posição é o Fluxo em Redes
-    public void AtualizarPosicao() {
-        for (int i = 0; i < enxame.length; i++) {
-            enxame[i].AtualizarPosicao();
+    
+    public void avaliaParticulas(){
+        for (int indiceParticula = 0; indiceParticula < enxame.length; indiceParticula++) {
+            enxame[indiceParticula].AvaliarParticula();
+            System.out.println("Avaliação da Partícula " + indiceParticula + " = " + enxame[indiceParticula].getAvaliacao());
         }
     }
-    
-    
+
     public void ObterGbest() {
         double gbestIteracao;
         gbestIteracao = enxame[0].getpBest();
@@ -98,18 +94,6 @@ public class PSO {
         }
     }
 
-
-    public List<double[][]> executar(List<List<Arco>> arcosSuperBasicos) {
-        AvaliarParticulas();
-        ObterGbest();
-        AtualizarVelocidade(arcosSuperBasicos);
-        List<double[][]> velocidadesParticulas = new ArrayList<>();
-        for (int i = 0; i < enxame.length; i++) {
-            velocidadesParticulas.add(enxame[i].getVelocidade());
-        }
-        return velocidadesParticulas;
-    }
-    
 
     public double getC1() {
         return c1;
