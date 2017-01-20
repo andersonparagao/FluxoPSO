@@ -53,16 +53,16 @@ public class ParticulaPSO {
         for (int j = 0; j < numUsinas; j++) {
             for (int k = 0; k < numIntervalos; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]);
-                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]);
+                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j])/0.5;
+                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j])/0.5;
             }
         }
 
         for (int j = 0; j < numUsinas; j++) {
             for (int k = numIntervalos; k < numIntervalos * 2; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]);
-                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]);
+                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j])/0.5;
+                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j])/0.5;
             }
         }
         
@@ -84,7 +84,11 @@ public class ParticulaPSO {
         return volumeinicial;
     }
 
-    public List AtualizarVelocidade(double c1, double c2, double r1, double r2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+    public List AtualizarVelocidade(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+        Random r = new Random();
+        double r1 = r.nextDouble();
+        double r2 = r.nextDouble();
+        
         int numUsinas = posicaoMin.length;
         int numIntervalos = posicao[0].length/2;
         List<Double> direcaoCaminhadaArcosSuperBasico = new ArrayList<>();
@@ -94,14 +98,14 @@ public class ParticulaPSO {
             int colunaOrigem = arcosSuperBasicos.get(i).getOrigem()[1];
             int linhaDestino = arcosSuperBasicos.get(i).getDestino()[0];
             int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
-            
+         //   System.out.println("Arco SuperBásico = " + arcosSuperBasicos.get(i).toString());
             // se o arco superbásico for um arco de volume
             if(linhaOrigem == linhaDestino){
                 direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-                velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]); 
+    //            velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]); 
             } else {
                 direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
-                velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]); 
+      //          velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]); 
             }
         }
         
@@ -123,7 +127,16 @@ public class ParticulaPSO {
                     if (posicao[i][j] < posicaoMin[i][j]) {
                         posicao[i][j] = posicaoMin[i][j];
                     }
-                }
+                } 
+//                else {
+//                    posicao[i][j] = posicao[i][j] + velocidade[i][j];
+//                    if (posicao[i][j] > posicaoMax[i][j]) {
+//                        posicao[i][j] = posicaoMax[i][j];
+//                    }
+//                    if (posicao[i][j] < posicaoMin[i][j]) {
+//                        posicao[i][j] = posicaoMin[i][j];
+//                    }
+//                }
             }
         }
     }
@@ -136,6 +149,21 @@ public class ParticulaPSO {
         simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
         simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
         avaliacao = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+        if (avaliacao < pBest) {
+            pBest = avaliacao;
+            for (int i = 0; i < posicaoMin.length; i++) {
+                System.arraycopy(posicao[i], 0, vetorpBest[i], 0, numIntervalos * 2);
+            }
+        }
+    }
+    
+    
+    public void AvaliarParticula2() {
+        int numIntervalos = posicaoMin[0].length/2;
+        int numUsinas = posicaoMin.length;
+        simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
+        simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
+        avaliacao = simulacao.simularOperacaoEnergeticaPSOFinal(numIntervalos);
         if (avaliacao < pBest) {
             pBest = avaliacao;
             for (int i = 0; i < posicaoMin.length; i++) {
@@ -259,6 +287,31 @@ public class ParticulaPSO {
                 } else {
                     System.out.print(posicao[i][j] + ", ");
                 }
+            }
+        }
+        System.out.println("\n");
+    }
+    
+    public void imprimePosicaoFinal(){
+        System.out.println("POSICAO");
+        for (int i = 0; i < posicao.length; i++) {
+            System.out.println();
+            for (int j = 0; j < posicao[0].length; j++) {
+                System.out.println(String.format("%.10f", posicao[i][j]));
+            }
+        }
+        System.out.println("\n");
+    }
+    
+    
+    public void imprimePosicaoAG(){
+        System.out.println("POSICAO");
+        for (int i = 0; i < posicao.length; i++) {
+            if(i != 0){
+                System.out.println();
+            }
+            for (int j = 0; j < posicao[0].length/2; j++) {
+                System.out.print(posicao[i][j] + ", ");
             }
         }
         System.out.println("\n");

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import simulacao.CarregarSistema;
 import simulacao.SimulacaoOperacaoEnergeticaPSO;
@@ -253,6 +254,72 @@ public class FluxoEmRede {
             }
         }
     }
+    
+    
+    public List executaParticaoEPA_TEC_PSO() {
+        int menor;
+        int maior;
+
+        simulacaoHidroeletrica.definirVolumesFinais(rede, numUsinas, numIntervalos);
+        simulacaoHidroeletrica.definirVazoesDefluentes(rede, numUsinas, numIntervalos);
+        simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+        ArrayList<IntervaloDeHorizonte> IntervalosHorizonte = simulacaoHidroeletrica.getHorizontePlanejamento().getIntervalos();
+
+        superBasicos.clear();
+        menor = getMenorCustoMarginal(IntervalosHorizonte);
+        maior = getMaiorCustoMarginal(IntervalosHorizonte);
+
+        int direita = maior;
+        int esquerda = menor;
+        if (maior < menor) {
+            direita = menor;
+            esquerda = maior;
+        }
+
+//        System.out.println("\nPeríodo com o Menor Custo Marginal = " + menor);
+//        System.out.println("Período com o Maior Custo Marginal = " + maior + "\n");
+        Arco arcobasico;
+
+        for (int usina = 0; usina < numUsinas; usina++) {
+            //colocando as defluencias do intervalo maior como variáveis básicas
+            if (rede[usina][direita + numIntervalos] != vazaoMin[usina]) {
+                MIVB[usina][direita] = 1;
+            } else {
+                MIVB[usina][direita] = 0;
+            }
+
+            //colocando as defluencias do intervalo menor como superbasicas
+            if ((rede[usina][esquerda] != volumeMax[usina]) && (rede[usina][esquerda] != volumeMin[usina])) {
+                superBasicos.add(new Arco(usina, esquerda, usinasJusante[usina], esquerda));
+            } else {
+                superBasicos.add(new Arco(usina, esquerda, usina, esquerda + 1));
+            }
+
+            //colocando se possivel os volumes ao longo do intervalo menor e maior
+            for (int k = esquerda; k < direita; k++) {
+                if (rede[usina][k] == volumeMax[usina] || rede[usina][k] == volumeMin[usina]) {
+                    //defluencia
+                    MIVB[usina][k] = 1;
+                } else {
+                    //volume
+                    MIVB[usina][k] = 0;
+                }
+            }
+        }
+
+        arcosBasicos.clear();
+        for (int j = 0; j < MIVB.length; j++) {
+            for (int k = 0; k < MIVB[0].length; k++) {
+                if (MIVB[j][k] == 0) {
+                    arcosBasicos.add(new Arco(j, k, j, k + 1));
+                } else if (MIVB[j][k] == 1) {
+                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                }
+            }
+        }
+        
+        return superBasicos;
+    }
 
     /**
      *
@@ -320,6 +387,67 @@ public class FluxoEmRede {
             }
         }
     }
+    
+    //usada no otimizador com o PSO
+    public Arco executaParticaoEPA_TEU_PSO(int indiceUsina) {
+        //arcosBasicos.clear();
+        simulacaoHidroeletrica.definirVolumesFinais(rede, numUsinas, numIntervalos);
+        simulacaoHidroeletrica.definirVazoesDefluentes(rede, numUsinas, numIntervalos);
+        simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+        ArrayList<IntervaloDeHorizonte> IntervalosHorizonte = simulacaoHidroeletrica.getHorizontePlanejamento().getIntervalos();
+        superBasicos.clear();
+        arcosBasicos.clear();
+
+        int maior = getMaiorCustoMarginal(IntervalosHorizonte);
+        int menor = getMenorCustoMarginal(IntervalosHorizonte);
+//        System.out.println("\nMaior = " + maior);
+//        System.out.println("Menor = " + menor + "\n");
+
+        int direita = maior;
+        int esquerda = menor;
+        if (maior < menor) {
+            direita = menor;
+            esquerda = maior;
+        }
+
+        //colocando as defluencias do intervalo maior como variáveis básicas
+        if (rede[indiceUsina][direita + numIntervalos] != vazaoMin[indiceUsina]) {
+            MIVB[indiceUsina][direita] = 1;
+        } else {
+            MIVB[indiceUsina][direita] = 0;
+        }
+
+        //colocando as defluencias do intervalo menor como superbasicas
+        if ((rede[indiceUsina][esquerda] != volumeMax[indiceUsina]) && (rede[indiceUsina][esquerda] != volumeMin[indiceUsina])) {
+            superBasicos.add(new Arco(indiceUsina, esquerda, usinasJusante[indiceUsina], esquerda));
+        } else {
+            superBasicos.add(new Arco(indiceUsina, esquerda, indiceUsina, esquerda + 1));
+        }
+
+        //colocando se possivel os volumes ao longo do intervalo menor e maior
+        for (int k = esquerda; k < direita; k++) {
+            if (rede[indiceUsina][k] == volumeMax[indiceUsina] || rede[indiceUsina][k] == volumeMin[indiceUsina]) {
+                //defluencia
+                MIVB[indiceUsina][k] = 1;
+            } else {
+                //volume
+                MIVB[indiceUsina][k] = 0;
+            }
+        }
+
+        arcosBasicos.clear();
+        for (int j = 0; j < MIVB.length; j++) {
+            for (int k = 0; k < MIVB[0].length; k++) {
+                if (MIVB[j][k] == 0) {
+                    arcosBasicos.add(new Arco(j, k, j, k + 1));
+                } else if (MIVB[j][k] == 1) {
+                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                }
+            }
+        }
+        
+        return superBasicos.get(0);
+    }
 
     private int IntervaloDiferencaCustoMarginal(int intervalo, ArrayList<IntervaloDeHorizonte> intervalos) {
         int indice = 0;
@@ -359,79 +487,67 @@ public class FluxoEmRede {
         return indice;
     }
 
-    public void calculaDirecaoDeCaminhadaArcosSuperBasicos() {
-        direcaoDeCaminhada = new double[numUsinas][numIntervalos * 2];
-        Random random = new Random();
-        double numeroAleatorio;
-
-        for (int i = 0; i < superBasicos.size(); i++) {
-            numeroAleatorio = random.nextDouble();
-            int indiceUsinaSB = superBasicos.get(i).getOrigem()[0];
-            int indiceIntervaloSB = superBasicos.get(i).getOrigem()[1];
-            if (numeroAleatorio < 0.5) {
-                //se o arco superbasico for de volume
-                if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = -numeroAleatorio;
-                } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio;
-                }
-            } else //se o arco superbasico for de volume
-             if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
-                } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio;
-                }
-        }
-
-//        System.out.println("Dentro do Método Direção de Caminhada dos Arcos SuperBásicos:");
-//        for (int i = 0; i < direcaoDeCaminhada.length; i++) {
-//            if(i != 0){
-//                System.out.println();
-//            }
-//            for (int j = 0; j < direcaoDeCaminhada[0].length; j++) {
-//                System.out.print(direcaoDeCaminhada[i][j] + ", ");
-//            }
+//    public void calculaDirecaoDeCaminhadaArcosSuperBasicos() {
+//        direcaoDeCaminhada = new double[numUsinas][numIntervalos * 2];
+//        Random random = new Random();
+//        double numeroAleatorio;
+//
+//        for (int i = 0; i < superBasicos.size(); i++) {
+//            numeroAleatorio = random.nextDouble();
+//            int indiceUsinaSB = superBasicos.get(i).getOrigem()[0];
+//            int indiceIntervaloSB = superBasicos.get(i).getOrigem()[1];
+//            if (numeroAleatorio < 0.5) {
+//                //se o arco superbasico for de volume
+//                if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
+//                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = -numeroAleatorio;
+//                } else {
+//                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio;
+//                }
+//            } else //se o arco superbasico for de volume
+//             if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
+//                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
+//                } else {
+//                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio;
+//                }
 //        }
-    }
-    
-    
-    public void calculaDirecaoDeCaminhadaArcosSuperBasicosPSO(ParticulaPSO partícula) {
-        direcaoDeCaminhada = new double[numUsinas][numIntervalos * 2];
-        Random random = new Random();
-        double numeroAleatorio;
-
-        for (int i = 0; i < superBasicos.size(); i++) {
-            numeroAleatorio = random.nextDouble();
-            int indiceUsinaSB = superBasicos.get(i).getOrigem()[0];
-            int indiceIntervaloSB = superBasicos.get(i).getOrigem()[1];
-            if (numeroAleatorio < 0.5) {
-                //se o arco superbasico for de volume
-                if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = -numeroAleatorio;
-                } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = -numeroAleatorio;
-                }
-            } else //se o arco superbasico for de volume
-             if (MIVB[indiceUsinaSB][indiceIntervaloSB] == 1) {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB] = numeroAleatorio;
-                } else {
-                    direcaoDeCaminhada[indiceUsinaSB][indiceIntervaloSB + numIntervalos] = numeroAleatorio;
-                }
-        }
-
-//        System.out.println("Dentro do Método Direção de Caminhada dos Arcos SuperBásicos:");
-//        for (int i = 0; i < direcaoDeCaminhada.length; i++) {
-//            if(i != 0){
-//                System.out.println();
-//            }
-//            for (int j = 0; j < direcaoDeCaminhada[0].length; j++) {
-//                System.out.print(direcaoDeCaminhada[i][j] + ", ");
-//            }
-//        }
-    }
-    
+//    }
 
     public void calculaProjecaoDeCaminhadaArcosSuperBasicos() {
+        for (int i = 0; i < superBasicos.size(); i++) {
+            int indiceUsina = superBasicos.get(i).getOrigem()[0];
+            int indiceIntervalo = superBasicos.get(i).getOrigem()[1];
+            //caso o arco superbasico sera de volume
+            if (MIVB[indiceUsina][indiceIntervalo] == 1) {
+                if ((rede[indiceUsina][indiceIntervalo] == volumeMax[indiceUsina]) && (direcaoDeCaminhada[indiceUsina][indiceIntervalo] > 0)) {
+                    direcaoDeCaminhada[indiceUsina][indiceIntervalo] = 0;
+                } else if ((rede[indiceUsina][indiceIntervalo] == volumeMin[indiceUsina]) && (direcaoDeCaminhada[indiceUsina][indiceIntervalo] < 0)) {
+                    direcaoDeCaminhada[indiceUsina][indiceIntervalo] = 0;
+                }
+            } else if ((rede[indiceUsina][numIntervalos + indiceIntervalo] == vazaoMax[indiceUsina]) && (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] > 0)) {
+                direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] = 0;
+            } else if ((rede[indiceUsina][numIntervalos + indiceIntervalo] == vazaoMin[indiceUsina]) && (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] < 0)) {
+                direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] = 0;
+            }
+        }
+    }
+    
+    
+    public void calculaProjecaoDeCaminhadaArcosSuperBasicosPSO(List<Double> direcaoCaminhadaSuperBasicos) {
+        direcaoDeCaminhada = new double[numUsinas][numIntervalos*2];
+        
+        // adiciono na matriz de direção de caminhada, a direção de caminhada dos arcos superbásicos
+        for (int i = 0; i < superBasicos.size(); i++) {
+            
+            // verifico se o arco superbásico é de defluência
+            if(superBasicos.get(i).getOrigem()[0] != superBasicos.get(i).getOrigem()[0]){
+                direcaoDeCaminhada[superBasicos.get(i).getOrigem()[0]][superBasicos.get(i).getOrigem()[1] + numIntervalos] = direcaoCaminhadaSuperBasicos.get(i);
+                //System.out.println("Direção de Caminhada do Arco SuperBásico " + i + " = " + direcaoDeCaminhada[superBasicos.get(i).getOrigem()[0]][superBasicos.get(i).getOrigem()[1] + numIntervalos]);
+            } else {
+                direcaoDeCaminhada[superBasicos.get(i).getOrigem()[0]][superBasicos.get(i).getOrigem()[1]] = direcaoCaminhadaSuperBasicos.get(i);
+                //System.out.println("Direção de Caminhada do Arco SuperBásico " + i + " = " + direcaoDeCaminhada[superBasicos.get(i).getOrigem()[0]][superBasicos.get(i).getOrigem()[1]]);
+            }
+        }
+        
         for (int i = 0; i < superBasicos.size(); i++) {
             int indiceUsina = superBasicos.get(i).getOrigem()[0];
             int indiceIntervalo = superBasicos.get(i).getOrigem()[1];
@@ -510,7 +626,8 @@ public class FluxoEmRede {
             }
         }
 
-        passoMaximo = menor;
+        passoMaximo = menor*0.8;
+        //System.out.println("Passo Máximo = " + passoMaximo);
     }
 
     private void calculaPassoMaximoBasicoSuperBasico() {
@@ -615,7 +732,7 @@ public class FluxoEmRede {
             executaParticaoEPAFPH();
             executaParticaoEPATEC();
             detectarCiclos();
-            calculaDirecaoDeCaminhadaArcosSuperBasicosPSO(particula);
+    //        calculaDirecaoDeCaminhadaArcosSuperBasicosPSO(particula);
             calculaProjecaoDeCaminhadaArcosSuperBasicos();
             calculaDirecaoDeCaminhadaArcosBasicos();
             calculaPassoMaximoDoCiclo();
@@ -624,7 +741,7 @@ public class FluxoEmRede {
                 executaParticaoEPAFPH();
                 executaParticaoEPATEU(i);
                 detectarCiclos();
-                calculaDirecaoDeCaminhadaArcosSuperBasicosPSO(particula);
+         //       calculaDirecaoDeCaminhadaArcosSuperBasicosPSO(particula);
                 calculaProjecaoDeCaminhadaArcosSuperBasicos();
                 calculaDirecaoDeCaminhadaArcosBasicos();
                 calculaPassoMaximoDoCiclo();
@@ -633,6 +750,42 @@ public class FluxoEmRede {
         
         return AtualizarVelocidade();
     }
+    
+    
+    public List executaFluxoEmRedeParte1EPA_TEC(ParticulaPSO particula) {
+        setRede(particula.getPosicao());
+        List<Arco> superBasicos = new ArrayList<>();
+
+        executaParticaoEPAFPH();
+        superBasicos = executaParticaoEPA_TEC_PSO();
+        
+        return superBasicos;
+    }
+    
+    
+    public List executaFluxoEmRedeParte1EPA_TEU(int indiceUsina, ParticulaPSO particula) {
+        setRede(particula.getPosicao());
+        List<Arco> superBasicos = new ArrayList<>();
+
+        executaParticaoEPAFPH();
+        superBasicos.add(executaParticaoEPA_TEU_PSO(indiceUsina));
+        
+        
+        return superBasicos;
+    }
+    
+    public double[][] executaFluxoEmRedeParte2(List<Double> direcaoSuperBasicos, ParticulaPSO particula) {
+        setRede(particula.getPosicao());
+
+        detectarCiclos();
+        calculaProjecaoDeCaminhadaArcosSuperBasicosPSO(direcaoSuperBasicos);
+        calculaDirecaoDeCaminhadaArcosBasicos();
+        calculaPassoMaximoDoCiclo();
+        
+        return AtualizarVelocidade();
+    }
+    
+    
 
     private boolean VerificarTrilhaDeOrigem(Arco arco, Ciclo ciclo) {
         for (int i = 0; i < ciclo.getTrilhaorigem().size(); i++) {

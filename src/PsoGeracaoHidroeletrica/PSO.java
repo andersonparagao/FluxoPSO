@@ -46,14 +46,10 @@ public class PSO {
         }
     }
 
-    public List AtualizarVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos) {
-        Random geradorAleatorior1 = new Random();
-        r1 = geradorAleatorior1.nextDouble();
-        Random geradorAleatorior2 = new Random();
-        r2 = geradorAleatorior2.nextDouble();
+    public List atualizaVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos) {
         List<Double> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
 
-        direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].AtualizarVelocidade(c1, c2, r1, r2, gBest.getPosicao(), arcosSuperBasicos);
+        direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].AtualizarVelocidade(c1, c2, gBest.getPosicao(), arcosSuperBasicos);
         
         return direcaoCaminhadaArcosSuperBasicos;
     }
