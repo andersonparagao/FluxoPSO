@@ -53,16 +53,16 @@ public class ParticulaPSO {
         for (int j = 0; j < numUsinas; j++) {
             for (int k = 0; k < numIntervalos; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j])/0.5;
-                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j])/0.5;
+                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]);
+                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]);
             }
         }
 
         for (int j = 0; j < numUsinas; j++) {
             for (int k = numIntervalos; k < numIntervalos * 2; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j])/0.5;
-                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j])/0.5;
+                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]);
+                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]);
             }
         }
         
@@ -272,7 +272,6 @@ public class ParticulaPSO {
 
         return velocidadesIniciais;
     }
-
     
     
     public void imprimePosicao(){
@@ -303,23 +302,41 @@ public class ParticulaPSO {
         System.out.println("\n");
     }
     
-    
-    public void imprimePosicaoAG(){
-        System.out.println("POSICAO");
+    public void imprimeVolumes() {
+        System.out.println("Partícula");
         for (int i = 0; i < posicao.length; i++) {
-            if(i != 0){
-                System.out.println();
+            if (i != 0) {
+                System.out.print("\n{");
+            } else {
+                System.out.print("{{");
             }
-            for (int j = 0; j < posicao[0].length/2; j++) {
-                System.out.print(posicao[i][j] + ", ");
+
+            for (int j = 0; j < posicao[0].length / 2; j++) {
+                if (j == posicao[0].length / 2 - 1 && i != posicao.length - 1) {
+                    System.out.print(posicao[i][j] + "},");
+                } else if (j == posicao[0].length / 2 - 1 && i == posicao.length - 1) {
+                    System.out.print(posicao[i][j] + "}}");
+                } else {
+                    System.out.print(posicao[i][j] + ", ");
+                }
             }
         }
-        System.out.println("\n");
+
+        System.out.print("\n\nDefluências");
+        for (int i = 0; i < posicao.length; i++) {
+            System.out.println();
+            for (int j = posicao[0].length / 2; j < posicao[0].length; j++) {
+                System.out.println(posicao[i][j]);
+            }
+        }
+        System.out.println();
     }
     
     
+    
+    
     public void imprimeVelocidade(){
-        System.out.println("VELOCIDADE");
+        System.out.println("\nVELOCIDADE");
         for (int i = 0; i < velocidade.length; i++) {
             if(i != 0){
                 System.out.println();

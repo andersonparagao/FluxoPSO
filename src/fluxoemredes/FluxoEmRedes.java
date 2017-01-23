@@ -205,29 +205,33 @@ public class FluxoEmRedes {
 //            }
 //        }
 
-//        for (int i = 0; i < 5000; i++) {
-//            if (i < 2500) {
-//                fluxoEmRedes.executaParticaoEPAFPH();
-//                fluxoEmRedes.executaParticaoEPATEC();
-//                fluxoEmRedes.detectarCiclos();
-//                fluxoEmRedes.calculaDirecaoDeCaminhadaArcosSuperBasicos();
-//                fluxoEmRedes.calculaProjecaoDeCaminhadaArcosSuperBasicos();
-//                fluxoEmRedes.calculaDirecaoDeCaminhadaArcosBasicos();
-//                fluxoEmRedes.calculaPassoMaximoDoCiclo();
-//                fluxoEmRedes.AtualizarRede();
-//            } else {
-//                for (int j = 0; j < numUsinas; j++) {
-//                    fluxoEmRedes.executaParticaoEPAFPH();
-//                    fluxoEmRedes.executaParticaoEPATEU(j);
-//                    fluxoEmRedes.detectarCiclos();
-//                    fluxoEmRedes.calculaDirecaoDeCaminhadaArcosSuperBasicos();
-//                    fluxoEmRedes.calculaProjecaoDeCaminhadaArcosSuperBasicos();
-//                    fluxoEmRedes.calculaDirecaoDeCaminhadaArcosBasicos();
-//                    fluxoEmRedes.calculaPassoMaximoDoCiclo();
-//                    fluxoEmRedes.AtualizarRede();
-//                }
-//            }
-//        }
+        for (int i = 0; i < 2000; i++) {
+            if (i < 1000) {
+                fluxoEmRedes.executaParticaoEPAFPH();
+                fluxoEmRedes.executaParticaoEPATEC();
+                fluxoEmRedes.detectarCiclos();
+                fluxoEmRedes.calculaDirecaoDeCaminhadaArcosSuperBasicos();
+                fluxoEmRedes.calculaProjecaoDeCaminhadaArcosSuperBasicos();
+                fluxoEmRedes.calculaDirecaoDeCaminhadaArcosBasicos();
+                fluxoEmRedes.calculaPassoMaximoDoCiclo();
+                fluxoEmRedes.calculaPassoOtimo(fluxoEmRedes.passoMaximo, 0.11, 0.05);
+                fluxoEmRedes.AtualizarRede();
+            } else {
+                for (int j = 0; j < numUsinas; j++) {
+                    fluxoEmRedes.executaParticaoEPAFPH();
+                    fluxoEmRedes.executaParticaoEPATEU(j);
+                    fluxoEmRedes.detectarCiclos();
+                    fluxoEmRedes.calculaDirecaoDeCaminhadaArcosSuperBasicos();
+                    fluxoEmRedes.calculaProjecaoDeCaminhadaArcosSuperBasicos();
+                    fluxoEmRedes.calculaDirecaoDeCaminhadaArcosBasicos();
+                    fluxoEmRedes.calculaPassoMaximoDoCiclo();
+                    fluxoEmRedes.calculaPassoOtimo(fluxoEmRedes.passoMaximo, 0.11, 0.05);
+                    fluxoEmRedes.AtualizarRede();
+                }
+            }
+        }
+        
+        fluxoEmRedes.imprimeVolumes();
+        fluxoEmRedes.executaParticaoEPATEC_ExibirGeracaoHidraulica();
     }
-
 }
