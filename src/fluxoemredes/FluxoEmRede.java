@@ -751,7 +751,7 @@ public class FluxoEmRede {
             }
         }
         
-//        System.out.println("LimiteInferior = " + limiteInferior);
+        //System.out.println("LimiteInferior = " + limiteInferior);
         if(limiteInferior == 0){
             this.passoMaximo = passoMaximo/2.0;
         } else {
@@ -952,7 +952,6 @@ public class FluxoEmRede {
         setRede(particula.getPosicao());
 
         detectarCiclos();
- //       imprimeCiclos();
         calculaProjecaoDeCaminhadaArcosSuperBasicosPSO(direcaoSuperBasicos);
         calculaDirecaoDeCaminhadaArcosBasicos();
         calculaPassoMaximoDoCiclo();

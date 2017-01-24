@@ -55,8 +55,8 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 50;
-        int numeroIteracoes = 1000;
+        int numeroParticulas = 200;
+        int numeroIteracoes = 100;
         double c1 = 2;
         double c2 = 2;
         PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
@@ -72,11 +72,11 @@ public class FluxoEmRedesPSO {
                 soma = soma + pso.getEnxame()[indiceParticula].getAvaliacao();
             }
             mediaAvaliacoes.add(soma / numeroParticulas);
-            pso.ObterGbest();
+            pso.ObterGbest2();
             avalicaoGBest.add(pso.getgBest().getAvaliacao());
             for (int indiceParticula = 0; indiceParticula < numeroParticulas; indiceParticula++) {
                 //EPA-TEC
-                if (iteracao < numeroIteracoes / 2) {
+                if (iteracao < numeroIteracoes/2) {
                     superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC(pso.getEnxame()[indiceParticula]);
                     direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
                     matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
@@ -86,7 +86,7 @@ public class FluxoEmRedesPSO {
                     superBasicos = new ArrayList<>();
                     direcaoCaminhadaSuperBasicos = new ArrayList<>();
                     for (int i = 0; i < numeroUsinas; i++) {
-                        pso.getEnxame()[indiceParticula].AvaliarParticula2();
+                        pso.getEnxame()[indiceParticula].AvaliarParticula();
                         Arco arco = fluxo.executaFluxoEmRedeParte1EPA_TEU(i, pso.getEnxame()[indiceParticula]);
                         superBasicos.add(arco);
                         direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(2, 2, pso.getgBest().getPosicao(), superBasicos);

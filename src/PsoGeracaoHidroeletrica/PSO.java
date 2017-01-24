@@ -50,7 +50,7 @@ public class PSO {
         List<Double> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
 
         direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].AtualizarVelocidade(c1, c2, gBest.getPosicao(), arcosSuperBasicos);
-        
+
         return direcaoCaminhadaArcosSuperBasicos;
     }
 
@@ -61,8 +61,8 @@ public class PSO {
             enxame[i] = particula;
         }
     }
-    
-    public void avaliaParticulas(){
+
+    public void avaliaParticulas() {
         for (int indiceParticula = 0; indiceParticula < enxame.length; indiceParticula++) {
             enxame[indiceParticula].AvaliarParticula();
             System.out.println("Avaliação da Partícula " + indiceParticula + " = " + enxame[indiceParticula].getAvaliacao());
@@ -90,6 +90,22 @@ public class PSO {
         }
     }
 
+    public void ObterGbest2() {
+        int gbestPosicao = 0;
+        for (int i = 1; i < enxame.length; i++) {
+            if (enxame[i].getAvaliacao() < enxame[gbestPosicao].getAvaliacao()) {
+                gbestPosicao = i;
+            }
+        }
+
+        if (enxame[gbestPosicao].getAvaliacao() < gBest.getAvaliacao()) {
+            ParticulaPSO novoGBest = new ParticulaPSO(numUsinas, numIntervalos, vazaoMinima, vazaoMaxima, volumeMinimo, vazaoMaxima, simulacaoHidroeletrica);
+            novoGBest.setPosicao(enxame[gbestPosicao].getPosicao());
+            novoGBest.setVelocidade(enxame[gbestPosicao].getVelocidade());
+            novoGBest.setAvaliacao(enxame[gbestPosicao].getAvaliacao());
+            gBest = novoGBest;
+        }
+    }
 
     public double getC1() {
         return c1;

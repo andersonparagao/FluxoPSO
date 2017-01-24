@@ -53,16 +53,16 @@ public class ParticulaPSO {
         for (int j = 0; j < numUsinas; j++) {
             for (int k = 0; k < numIntervalos; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]);
-                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]);
+                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j])/10;
+                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j])/10;
             }
         }
 
         for (int j = 0; j < numUsinas; j++) {
             for (int k = numIntervalos; k < numIntervalos * 2; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]);
-                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]);
+                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j])/10;
+                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j])/10;
             }
         }
         
