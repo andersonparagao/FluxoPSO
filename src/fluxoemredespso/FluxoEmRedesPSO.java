@@ -6,12 +6,10 @@
 package fluxoemredespso;
 
 import PsoGeracaoHidroeletrica.PSO;
-import PsoGeracaoHidroeletrica.ParticulaPSO;
 import fluxoemredes.Arco;
 import fluxoemredes.FluxoEmRede;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import simulacao.CarregarSistema;
 import simulacao.SimulacaoOperacaoEnergeticaPSO;
 
@@ -55,10 +53,10 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 200;
+        int numeroParticulas = 50;
         int numeroIteracoes = 100;
-        double c1 = 2;
-        double c2 = 2;
+        double c1 = 4;
+        double c2 = 4;
         PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
 
         pso.inicializaParticulas();
@@ -76,7 +74,7 @@ public class FluxoEmRedesPSO {
             avalicaoGBest.add(pso.getgBest().getAvaliacao());
             for (int indiceParticula = 0; indiceParticula < numeroParticulas; indiceParticula++) {
                 //EPA-TEC
-                if (iteracao < numeroIteracoes/2) {
+                if (iteracao < numeroIteracoes/1.25) {
                     superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC(pso.getEnxame()[indiceParticula]);
                     direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
                     matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
@@ -100,7 +98,7 @@ public class FluxoEmRedesPSO {
 
         // exibindo a melhor Partícula
         System.out.println("Avaliação GBest = " + pso.getgBest().getAvaliacao());
-        pso.getgBest().imprimePosicaoFinal();
+        pso.getgBest().imprimePosicaoFinal(volumeMaximo, volumeMinimo);
         pso.getgBest().AvaliarParticula2();
         System.out.println("Avaliação da Melhor Partícula = " + pso.getgBest().getAvaliacao());
         pso.getgBest().imprimeVolumes();

@@ -696,7 +696,7 @@ public class FluxoEmRede {
 //        imprimeMatrizPassosMaximos();
         
         passoMaximo = menor;
-//        System.out.println("Passo Máximo = " + passoMaximo);
+        //System.out.println("Passo Máximo = " + passoMaximo);
     }
     
     public void calculaPassoOtimo(double passoMaximo, double tolerancia, double escalar){
@@ -758,8 +758,8 @@ public class FluxoEmRede {
             this.passoMaximo = limiteInferior;
         }
         
-//        System.out.println("Passo Máximo após o calculo do passo ótimo = " + this.passoMaximo);
-//        System.out.println();
+        //System.out.println("Passo Máximo após o calculo do passo ótimo = " + this.passoMaximo);
+        //System.out.println();
     }
     
     
@@ -796,19 +796,18 @@ public class FluxoEmRede {
                             matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMin[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
                         } else if (direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo] > 0) {
                             matrizPassosMaximos[indiceUsina][numIntervalos + indiceIntervalo] = (vazaoMax[indiceUsina] - rede[indiceUsina][numIntervalos + indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][numIntervalos + indiceIntervalo];
-
                         }
                     }
                 } else//caso em que o arco basico é montante
                 //verificando se o passo maximo do arco basico ja foi calculado
-                 if (matrizPassosMaximos[indiceUsina][indiceIntervalo] == 0) {
+                if (matrizPassosMaximos[indiceUsina][indiceIntervalo] == 0) {
                         if (direcaoDeCaminhada[indiceUsina][indiceIntervalo] < 0) {
                             matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMin[indiceUsina] - rede[indiceUsina][indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
                         } else if (direcaoDeCaminhada[indiceUsina][indiceIntervalo] > 0) {
                             matrizPassosMaximos[indiceUsina][indiceIntervalo] = (volumeMax[indiceUsina] - rede[indiceUsina][indiceIntervalo]) / direcaoDeCaminhada[indiceUsina][indiceIntervalo];
 
                         }
-                    }
+                }
             }
         }
     }

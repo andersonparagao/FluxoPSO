@@ -53,19 +53,18 @@ public class ParticulaPSO {
         for (int j = 0; j < numUsinas; j++) {
             for (int k = 0; k < numIntervalos; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j])/10;
-                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j])/10;
+                velocidadeMin[j][k] = (xminvolume[j] - xmaxvolume[j]);
+                velocidadeMax[j][k] = (xmaxvolume[j] - xminvolume[j]);
             }
         }
 
         for (int j = 0; j < numUsinas; j++) {
             for (int k = numIntervalos; k < numIntervalos * 2; k++) {
                 // velocidades mínimas e máximas são iguais?
-                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j])/10;
-                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j])/10;
+                velocidadeMin[j][k] = (xminvazao[j] - xmaxvazao[j]);
+                velocidadeMax[j][k] = (xmaxvazao[j] - xminvazao[j]);
             }
         }
-        
     }
 
     public double[][] volumeInicial(double[][] volumevazao, int numintervalos, int numUsinas) {
@@ -98,14 +97,85 @@ public class ParticulaPSO {
             int colunaOrigem = arcosSuperBasicos.get(i).getOrigem()[1];
             int linhaDestino = arcosSuperBasicos.get(i).getDestino()[0];
             int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
-         //   System.out.println("Arco SuperBásico = " + arcosSuperBasicos.get(i).toString());
+
             // se o arco superbásico for um arco de volume
             if(linhaOrigem == linhaDestino){
-                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-    //            velocidade[linhaOrigem][colunaOrigem] = velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]); 
+                double direcao = (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
             } else {
-                direcaoCaminhadaArcosSuperBasico.add(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
-      //          velocidade[linhaOrigem][colunaOrigem + numIntervalos] = velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]); 
+                double direcao = (velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
+            }
+        }
+        
+        return direcaoCaminhadaArcosSuperBasico;
+    }
+    
+    
+    
+    public List AtualizarVelocidadeFatorConstricao(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+        Random r = new Random();
+        double r1 = r.nextDouble();
+        double r2 = r.nextDouble();
+        
+        double fi = c1 + c2;
+        double denominador = (2 - fi - (Math.sqrt(Math.pow(fi, 2) - 4*fi)));
+        double k = 2/denominador;
+        
+        
+        
+        int numUsinas = posicaoMin.length;
+        int numIntervalos = posicao[0].length/2;
+        List<Double> direcaoCaminhadaArcosSuperBasico = new ArrayList<>();
+        
+        for (int i = 0; i < arcosSuperBasicos.size(); i++) {
+            int linhaOrigem = arcosSuperBasicos.get(i).getOrigem()[0];
+            int colunaOrigem = arcosSuperBasicos.get(i).getOrigem()[1];
+            int linhaDestino = arcosSuperBasicos.get(i).getDestino()[0];
+            int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
+
+            // se o arco superbásico for um arco de volume
+            if(linhaOrigem == linhaDestino){
+                double direcao = -k*(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
+              //  System.out.println("Com K = " + direcao);
+               // System.out.println("Sem K = " + (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem])));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
+            } else {
+                double direcao = -k*(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
+                //System.out.println("com K " + direcao);
+                //System.out.println("SEM K = " + (velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos])));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
+            }
+        }
+        
+        return direcaoCaminhadaArcosSuperBasico;
+    }
+    
+    
+    public List AtualizarVelocidadeConstanteInercia(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+        Random r = new Random();
+        double r1 = r.nextDouble();
+        double r2 = r.nextDouble();
+        
+        double contanteInercia = 0.75;
+        
+        int numUsinas = posicaoMin.length;
+        int numIntervalos = posicao[0].length/2;
+        List<Double> direcaoCaminhadaArcosSuperBasico = new ArrayList<>();
+        
+        for (int i = 0; i < arcosSuperBasicos.size(); i++) {
+            int linhaOrigem = arcosSuperBasicos.get(i).getOrigem()[0];
+            int colunaOrigem = arcosSuperBasicos.get(i).getOrigem()[1];
+            int linhaDestino = arcosSuperBasicos.get(i).getDestino()[0];
+            int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
+
+            // se o arco superbásico for um arco de volume
+            if(linhaOrigem == linhaDestino){
+                double direcao = (contanteInercia*velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
+            } else {
+                double direcao = (contanteInercia*velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
+                direcaoCaminhadaArcosSuperBasico.add(direcao);
             }
         }
         
@@ -128,15 +198,6 @@ public class ParticulaPSO {
                         posicao[i][j] = posicaoMin[i][j];
                     }
                 } 
-//                else {
-//                    posicao[i][j] = posicao[i][j] + velocidade[i][j];
-//                    if (posicao[i][j] > posicaoMax[i][j]) {
-//                        posicao[i][j] = posicaoMax[i][j];
-//                    }
-//                    if (posicao[i][j] < posicaoMin[i][j]) {
-//                        posicao[i][j] = posicaoMin[i][j];
-//                    }
-//                }
             }
         }
     }
@@ -291,12 +352,24 @@ public class ParticulaPSO {
         System.out.println("\n");
     }
     
-    public void imprimePosicaoFinal(){
+    public void imprimePosicaoFinal(double[] volumesMaximos, double[] volumesMinimos){
         System.out.println("POSICAO");
         for (int i = 0; i < posicao.length; i++) {
             System.out.println();
+            for (int j = 0; j < posicao[0].length/2; j++) {
+                System.out.println(String.format("%.10f", ((posicao[i][j] - volumesMinimos[i])/(volumesMaximos[i] - volumesMinimos[i]))));
+            }
+        }
+        System.out.println("\n");
+    }
+    
+    
+    public void imprimePosicaoFinalNormalizada(){
+        System.out.println("POSICAO NORMALIZADA");
+        for (int i = 0; i < posicao.length; i++) {
+            System.out.println();
             for (int j = 0; j < posicao[0].length; j++) {
-                System.out.println(String.format("%.10f", posicao[i][j]));
+                System.out.println(String.format("%.10f", ((velocidadeMax[i][j] - posicao[i][j])/(velocidadeMax[i][j] - velocidadeMin[i][j]))));
             }
         }
         System.out.println("\n");
