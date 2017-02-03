@@ -83,6 +83,86 @@ public class ParticulaPSO {
         return volumeinicial;
     }
 
+    public List AtualizarVelocidadeWellington(int indiceParticula, double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+        //Random r = new Random();
+        //double r1 = r.nextDouble();
+        //double r2 = r.nextDouble();
+        double avaliacaoAtual;
+        int numUsinas = posicaoMin.length;
+        int numIntervalos = posicao[0].length/2;
+        List<Double> direcaoCaminhadaArcosSuperBasico = new ArrayList<>();
+        double[][] posicaoAproximacao = new double[numUsinas][numIntervalos*2];
+        
+        for(int i = 0 ; i < arcosSuperBasicos.size(); i++){
+            int linhaOrigem = arcosSuperBasicos.get(i).getOrigem()[0];
+            int colunaOrigem = arcosSuperBasicos.get(i).getOrigem()[1];
+            int linhaDestino = arcosSuperBasicos.get(i).getDestino()[0];
+            int colunaDestino = arcosSuperBasicos.get(i).getDestino()[1];
+            for(int j = 0;j < posicao.length;j++){
+                for(int l = 0; l < posicao[0].length;l++){
+                    posicaoAproximacao[j][l] = posicao[j][l];
+                }
+            }
+         //   System.out.println("Arco SuperBásico = " + arcosSuperBasicos.get(i).toString());
+            if(linhaOrigem != linhaDestino){
+         //       System.out.println("defluencia");
+                //System.out.println("defluencia antes: " + posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos]);
+                posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos] = posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos] + 1 ;
+                //System.out.println("defluencia depois: " + posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos]);
+                simulacao.definirVolumesFinais(posicaoAproximacao, numUsinas, numIntervalos);
+                simulacao.definirVazoesDefluentes(posicaoAproximacao, numUsinas, numIntervalos);
+                double defluenciaposicao = posicao[linhaOrigem][colunaOrigem + numIntervalos] ;
+                double defluenciaAproximacao  = posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos];
+                //System.out.println("defluencia antes: " + defluenciaposicao);
+                //System.out.println("defluencia depois: " + defluenciaAproximacao);
+                //System.out.println("avaliacao antes:  " + avaliacao);
+                double aval = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+                simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
+                simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
+                avaliacaoAtual = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+                //System.out.println("avaliacao depois: " + aval);
+                //System.out.println("avaliacao atual: " + avaliacaoAtual);
+                //System.out.println("avaliacao depois: " + aval);
+                if(indiceParticula == 0){
+                    direcaoCaminhadaArcosSuperBasico.add(-1*(aval - avaliacaoAtual));
+                } else {
+                    Random r = new Random();
+                    direcaoCaminhadaArcosSuperBasico.add(-1*(r.nextDouble())*(aval - avaliacaoAtual));
+                }
+                
+                //direcaoCaminhadaArcosSuperBasico.add(-1*(simulacao.simularOperacaoEnergeticaPSO(numIntervalos) - avaliacao));
+            }else{
+                //posicaoAproximacao = posicao;
+           //     System.out.println("volume");
+                if(posicaoAproximacao[linhaOrigem][colunaOrigem]!=posicaoMax[linhaOrigem][0]){
+                    posicaoAproximacao[linhaOrigem][colunaOrigem] = posicaoAproximacao[linhaOrigem][colunaOrigem] + 1;
+                }else{
+                    posicaoAproximacao[linhaOrigem][colunaOrigem] = posicaoAproximacao[linhaOrigem][colunaOrigem] - 1;
+                }
+                simulacao.definirVolumesFinais(posicaoAproximacao, numUsinas, numIntervalos);
+                simulacao.definirVazoesDefluentes(posicaoAproximacao, numUsinas, numIntervalos);
+                //System.out.println("avaliacao antes:  " + avaliacao);
+                double aval = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+                simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
+                simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
+                avaliacaoAtual = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+                //System.out.println("avaliacao depois: " + aval);
+                //System.out.println("avaliacao atual: " + avaliacaoAtual);
+                //System.out.println("avaliacao depois: " + aval);
+                if(indiceParticula == 0){
+                    direcaoCaminhadaArcosSuperBasico.add(-1*(aval - avaliacaoAtual));
+                } else {
+                    Random r = new Random();
+                    direcaoCaminhadaArcosSuperBasico.add(-1*(r.nextDouble())*(aval - avaliacaoAtual));
+                }
+                
+            }
+            //System.out.println("direcao caminhada: " + direcaoCaminhadaArcosSuperBasico.get(i));
+        }
+        
+        return direcaoCaminhadaArcosSuperBasico;
+    }
+    
     public List AtualizarVelocidade(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
         Random r = new Random();
         double r1 = r.nextDouble();
@@ -137,13 +217,13 @@ public class ParticulaPSO {
             // se o arco superbásico for um arco de volume
             if(linhaOrigem == linhaDestino){
                 double direcao = -k*(velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]));
-              //  System.out.println("Com K = " + direcao);
-               // System.out.println("Sem K = " + (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem])));
+//                System.out.println("Com K = " + direcao);
+//                System.out.println("Sem K = " + (velocidade[linhaOrigem][colunaOrigem] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem] - posicao[linhaOrigem][colunaOrigem])));
                 direcaoCaminhadaArcosSuperBasico.add(direcao);
             } else {
                 double direcao = -k*(velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]));
-                //System.out.println("com K " + direcao);
-                //System.out.println("SEM K = " + (velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos])));
+//                System.out.println("com K " + direcao);
+//                System.out.println("SEM K = " + (velocidade[linhaOrigem][colunaOrigem + numIntervalos] + c1 * r1 * (vetorpBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos]) + c2 * r2 * (gBest[linhaOrigem][colunaOrigem + numIntervalos] - posicao[linhaOrigem][colunaOrigem + numIntervalos])));
                 direcaoCaminhadaArcosSuperBasico.add(direcao);
             }
         }
