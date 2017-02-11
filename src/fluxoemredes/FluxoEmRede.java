@@ -249,7 +249,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -314,7 +314,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -378,7 +378,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -387,7 +387,34 @@ public class FluxoEmRede {
     }
     
     
-    public List executaParticaoEPA_TEC_PSO2(int mesIncio, int mesFim) {
+    //EPA-TEC COM TODOS OS ARCOS NÃO-BÁSICOS COMO SUPERBÁSCIOS
+    public List executaParticaoEPA_TEC_PSO_TODOS() {
+        superBasicos.clear();
+        Arco arcobasico;
+
+        arcosBasicos.clear();
+        for (int j = 0; j < MIVB.length; j++) {
+            for (int k = 0; k < MIVB[0].length; k++) {
+                if (MIVB[j][k] == 0) {
+                    arcosBasicos.add(new Arco(j, k, j, k + 1));
+                    superBasicos.add(new Arco(j, k, usinasJusante[j], k));
+                } else if (MIVB[j][k] == 1) {
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
+                    superBasicos.add(new Arco(j, k, j, k + 1));
+                }
+            }
+        }
+        System.out.println("Básicos");
+        imprimeArcosBasicos();
+        System.out.println("Superbásicos");
+        imprimeArcosSuperBasicos();
+        System.out.println("Quantidade de SuperBásicos = "  + superBasicos.size());
+        System.out.println("Quantidade de Cliclos Formados  = " + ciclos.size());
+        return superBasicos;
+    }
+    
+    
+    public List executaParticaoEPA_TEC_PSO2(int mesInicio, int mesFim) {
         superBasicos.clear();
         
         Arco arcobasico;
@@ -401,14 +428,14 @@ public class FluxoEmRede {
             }
 
             //colocando as defluencias do intervalo menor como superbasicas
-            if ((rede[usina][mesIncio] != volumeMax[usina]) && (rede[usina][mesIncio] != volumeMin[usina])) {
-                superBasicos.add(new Arco(usina, mesIncio, usinasJusante[usina], mesIncio));
+            if ((rede[usina][mesInicio] != volumeMax[usina]) && (rede[usina][mesInicio] != volumeMin[usina])) {
+                superBasicos.add(new Arco(usina, mesInicio, usinasJusante[usina], mesInicio));
             } else {
-                superBasicos.add(new Arco(usina, mesIncio, usina, mesIncio + 1));
+                superBasicos.add(new Arco(usina, mesInicio, usina, mesInicio + 1));
             }
 
             //colocando se possivel os volumes ao longo do intervalo menor e maior
-            for (int k = mesIncio; k < mesFim; k++) {
+            for (int k = mesInicio; k < mesFim; k++) {
                 if (rede[usina][k] == volumeMax[usina] || rede[usina][k] == volumeMin[usina]) {
                     //defluencia
                     MIVB[usina][k] = 1;
@@ -425,7 +452,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -494,7 +521,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -553,7 +580,7 @@ public class FluxoEmRede {
                 if (MIVB[j][k] == 0) {
                     arcosBasicos.add(new Arco(j, k, j, k + 1));
                 } else if (MIVB[j][k] == 1) {
-                    arcosBasicos.add(new Arco(j, k, j + 1, k));
+                    arcosBasicos.add(new Arco(j, k, usinasJusante[j], k));
                 }
             }
         }
@@ -809,6 +836,115 @@ public class FluxoEmRede {
         //System.out.println();
     }
     
+    //Wellington
+    public void calculaPassoOtimoRazaoAurea(double alfa, double a,double b,double tolerancia){
+        //passo double menor = 0;
+        double lambda, mi;
+        lambda = a + (1-alfa)*(b-a);
+        mi = a + alfa*(b-a);
+        System.out.println("passo maximo " + passoMaximo);
+        while((b-a)>=tolerancia){
+//            System.out.println("b antes: " + b);
+//            System.out.println("a antes: " + a);
+            double[][] particulaLambda = AtualizarRedePassoOtimo(lambda);
+            double[][] particulaMi = AtualizarRedePassoOtimo(mi);
+                        
+//                int numIntervalos = rede[0].length/2;
+//                int numUsinas = rede.length;
+                // avaliação utlizando o Passo Ótimo o Lambda
+            simulacaoHidroeletrica.definirVolumesFinais(particulaLambda, numUsinas, numIntervalos);
+            simulacaoHidroeletrica.definirVazoesDefluentes(particulaLambda, numUsinas, numIntervalos);
+            double avaliacaoLambda = simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+                
+                // avaliação utilizando o Passo Ótimo o Mi
+            simulacaoHidroeletrica.definirVolumesFinais(particulaMi, numUsinas, numIntervalos);
+            simulacaoHidroeletrica.definirVazoesDefluentes(particulaMi, numUsinas, numIntervalos);
+            double avaliacaoMi = simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+//            double valorLambda = funcao(lambda);
+//            double valorMi = funcao(mi);
+//            System.out.println("avalicao lambda: " + avaliacaoLambda);
+//            System.out.println("avalicao mi: " + avaliacaoMi);
+            if(avaliacaoLambda > avaliacaoMi){
+                a = lambda;
+                lambda = mi;
+                mi = a + alfa*(b - a);
+            }else{
+                b = mi;
+                mi = lambda;
+                lambda = a + (1 - alfa)*(b - a);      
+            }
+        }
+//        System.out.println("b depois: " + b);
+//        System.out.println("a depois: " + a);
+ //       System.out.println("passo maximo antes: " + this.passoMaximo);
+        this.passoMaximo = (a + b)/2.0;
+ //       System.out.println("passo maximo depois: " + this.passoMaximo);
+    }
+    
+    public void calculaPassoOtimoRazaoAureaAnderson(double passoMaximo, double tolerancia, double escalar){
+        double limiteSuperior;
+        double limiteInferior;
+        double alfa = 0.618;
+        boolean continuar = true;
+        
+        // defino os limites superior e inferior
+        if(passoMaximo < 0){
+            limiteInferior = passoMaximo;
+            limiteSuperior = 0;
+        } else {
+            limiteInferior = 0;
+            limiteSuperior = passoMaximo;
+        }
+        
+        double lambda;
+        double mi;
+        
+        while (continuar) {
+//            System.out.println("Limite Inferior = " + limiteInferior);
+//            System.out.println("Limite Superior = " + limiteSuperior);
+//            System.out.println("Diferença = " + (limiteSuperior - limiteInferior));
+            if(limiteSuperior - limiteInferior < tolerancia || passoMaximo == 1.7976931348623157E308){
+                continuar = false;
+            } else {
+                lambda = (limiteInferior + (1 - alfa)*(limiteSuperior - limiteInferior));
+                mi = limiteInferior + alfa*(limiteSuperior - limiteInferior);
+                
+                // agora eu atualizo a rede com cada um dos passos (lambda e mi)
+                // e calculo a geração hidrúalica da redes atualizadas pelo lambda e pelo mi  
+                double[][] particulaLambda = AtualizarRedePassoOtimo(lambda);
+                double[][] particulaMi = AtualizarRedePassoOtimo(mi);
+                        
+                int numIntervalos = rede[0].length/2;
+                int numUsinas = rede.length;
+                // avaliação utlizando o Passo Ótimo o Lambda
+                simulacaoHidroeletrica.definirVolumesFinais(particulaLambda, numUsinas, numIntervalos);
+                simulacaoHidroeletrica.definirVazoesDefluentes(particulaLambda, numUsinas, numIntervalos);
+                double avaliacaoLambda = simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+                
+                // avaliação utilizando o Passo Ótimo o Mi
+                simulacaoHidroeletrica.definirVolumesFinais(particulaMi, numUsinas, numIntervalos);
+                simulacaoHidroeletrica.definirVazoesDefluentes(particulaMi, numUsinas, numIntervalos);
+                double avaliacaoMi = simulacaoHidroeletrica.simularOperacaoEnergeticaPSO(numIntervalos);
+                
+                if(avaliacaoLambda < avaliacaoMi){
+                    limiteSuperior = mi;
+                } else {
+                    limiteInferior = lambda;
+                }
+            }
+        }
+        
+        //System.out.println("LimiteInferior = " + limiteInferior);
+//        if(limiteInferior == 0){
+//            this.passoMaximo = passoMaximo/2.0;
+//        } else {
+            this.passoMaximo = (limiteSuperior + limiteInferior)/2.0;
+//        }
+        
+        //System.out.println("Passo Máximo após o calculo do passo ótimo = " + this.passoMaximo);
+        //System.out.println();
+    }
+    
     
 
     private void calculaPassoMaximoBasicoSuperBasico() {
@@ -985,6 +1121,16 @@ public class FluxoEmRede {
         return superBasicos;
     }
     
+    public List executaFluxoEmRedeParte1EPA_TEC_TODOS(ParticulaPSO particula) {
+        setRede(particula.getPosicao());
+        List<Arco> superBasicos = new ArrayList<>();
+
+        executaParticaoEPAFPH();
+        superBasicos = executaParticaoEPA_TEC_PSO_TODOS();
+        
+        return superBasicos;
+    }
+    
     
     public Arco executaFluxoEmRedeParte1EPA_TEU(int indiceUsina, ParticulaPSO particula) {
         setRede(particula.getPosicao());
@@ -1012,7 +1158,7 @@ public class FluxoEmRede {
         calculaProjecaoDeCaminhadaArcosSuperBasicosPSO(direcaoSuperBasicos);
         calculaDirecaoDeCaminhadaArcosBasicos();
         calculaPassoMaximoDoCiclo();
-        calculaPassoOtimo(passoMaximo, 0.11, 0.05);
+        calculaPassoOtimoRazaoAureaAnderson(passoMaximo, 0.11, 0.05);
         return AtualizarVelocidade();
     }
     

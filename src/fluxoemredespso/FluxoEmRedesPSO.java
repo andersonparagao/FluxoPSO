@@ -53,7 +53,7 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 50;
+        int numeroParticulas = 150;
         int numeroIteracoes = 100;
         double c1 = 2;
         double c2 = 2;
@@ -108,38 +108,42 @@ public class FluxoEmRedesPSO {
             avalicaoGBest.add(pso.getgBest().getAvaliacao());
             for (int indiceParticula = 0; indiceParticula < numeroParticulas; indiceParticula++) {
                 //EPA-TEC
-                if (iteracao < 5) {
-                    if (iteracao < numeroIteracoes / 2) {
+                if (iteracao < 15) {
+                    //System.out.println("EPA-TEC todos");
                         for (int i = 0; i < numeroIntervalos - 1; i++) {
                             for (int j = i + 1; j < numeroIntervalos; j++) {
-                                superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC2(pso.getEnxame()[indiceParticula], i, j);
-                                direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidadeWellington(indiceParticula, c1, c2, pso.getgBest().getPosicao(), superBasicos);
+                                superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC_TODOS(pso.getEnxame()[indiceParticula]);
+                                direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
                                 matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
                                 pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
                                 pso.getEnxame()[indiceParticula].AvaliarParticula();
                                 pso.ObterGbest2();
                             }
                         }
-                    }
-                } else if (iteracao < numeroIteracoes / 2) {
-                    superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC(pso.getEnxame()[indiceParticula]);
-                    direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidadeWellington(indiceParticula, c1, c2, pso.getgBest().getPosicao(), superBasicos);
-                    matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
-                    pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
-                } else {
-                    //EPA-TEU
-                    superBasicos = new ArrayList<>();
-                    direcaoCaminhadaSuperBasicos = new ArrayList<>();
-                    for (int i = 0; i < numeroUsinas; i++) {
-                        pso.getEnxame()[indiceParticula].AvaliarParticula();
-                        Arco arco = fluxo.executaFluxoEmRedeParte1EPA_TEU(i, pso.getEnxame()[indiceParticula]);
-                        superBasicos.add(arco);
-                        direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidadeWellington(indiceParticula, 2, 2, pso.getgBest().getPosicao(), superBasicos);
-                        matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
-                        pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
-                        superBasicos.clear();
-                    }
                 }
+//                } else {
+//                    //System.out.println("EPA-TEC normal");
+//                    if (iteracao < numeroIteracoes / 2) {
+//                        superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC(pso.getEnxame()[indiceParticula]);
+//                        direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
+//                        matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
+//                        pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
+//                    } else {
+//                      //  System.out.println("EPA-TEU");
+//                        //EPA-TEU
+//                        superBasicos = new ArrayList<>();
+//                        direcaoCaminhadaSuperBasicos = new ArrayList<>();
+//                        for (int i = 0; i < numeroUsinas; i++) {
+//                            pso.getEnxame()[indiceParticula].AvaliarParticula();
+//                            Arco arco = fluxo.executaFluxoEmRedeParte1EPA_TEU(i, pso.getEnxame()[indiceParticula]);
+//                            superBasicos.add(arco);
+//                            direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
+//                            matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
+//                            pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
+//                            superBasicos.clear();
+//                        }
+//                    }
+//                }
             }
         }
 
