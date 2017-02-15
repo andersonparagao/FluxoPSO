@@ -163,7 +163,7 @@ public class ParticulaPSO {
         return direcaoCaminhadaArcosSuperBasico;
     }
     
-    public List AtualizarVelocidade(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
+    public List atualizaVelocidadePadrao(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
         Random r = new Random();
         double r1 = r.nextDouble();
         double r2 = r.nextDouble();
@@ -201,8 +201,6 @@ public class ParticulaPSO {
         double fi = c1 + c2;
         double denominador = (2 - fi - (Math.sqrt(Math.pow(fi, 2) - 4*fi)));
         double k = 2/denominador;
-        
-        
         
         int numUsinas = posicaoMin.length;
         int numIntervalos = posicao[0].length/2;
@@ -262,6 +260,29 @@ public class ParticulaPSO {
         return direcaoCaminhadaArcosSuperBasico;
     }
 
+    
+    public List atualizaVelocidade(int indiceParticula, double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos, int tipoAtualizacaoVelocidade) {
+        List<Double> resultado = new ArrayList<>();
+        switch(tipoAtualizacaoVelocidade){
+            case 1: //Atualização Padrão
+                resultado = atualizaVelocidadePadrao(c1, c2, gBest, arcosSuperBasicos);
+                break;
+                
+            case 2: // Atualização Wellington    
+                resultado = AtualizarVelocidadeWellington(indiceParticula, c1, c2, gBest, arcosSuperBasicos);
+                break;
+                
+            case 3:
+                resultado = AtualizarVelocidadeConstanteInercia(c1, c2, gBest, arcosSuperBasicos);
+                break;
+            
+            case 4:
+                resultado = AtualizarVelocidadeFatorConstricao(c1, c2, gBest, arcosSuperBasicos);
+        }
+    
+        return resultado;
+    }
+    
     // quem vai atualizar vai ser o Fluxo em Rede
     public void AtualizarPosicao(double[][] matrizFluxo) {
         int numUsinas = posicao.length;
@@ -290,12 +311,14 @@ public class ParticulaPSO {
         simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
         simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
         avaliacao = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
+        
         if (avaliacao < pBest) {
             pBest = avaliacao;
             for (int i = 0; i < posicaoMin.length; i++) {
                 System.arraycopy(posicao[i], 0, vetorpBest[i], 0, numIntervalos * 2);
             }
         }
+        
     }
     
     

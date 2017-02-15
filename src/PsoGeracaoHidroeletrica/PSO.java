@@ -3,7 +3,6 @@ package PsoGeracaoHidroeletrica;
 import fluxoemredes.Arco;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 //import simulacao.SimulacaoOperacaoEnergetica;
 import simulacao.SimulacaoOperacaoEnergeticaPSO;
@@ -24,6 +23,9 @@ public class PSO {
     private int numUsinas;
     private int numIntervalos;
     private ParticulaPSO gBest;
+    
+    private List<Double> mediaAvaliacoes = new ArrayList<>();
+    private List<Double> avaliacoesGBest = new ArrayList<>();
 
     public PSO(SimulacaoOperacaoEnergeticaPSO simulacaoHidroeletrica, double demanda, double[] vazaoMinima, double[] vazaoMaxima, double[] volumeMinimo, double[] volumeMaximo, int numeroParticulas, int numUsinas, int numIntervalos, double c1, double c2) {
         this.numUsinas = numUsinas;
@@ -41,15 +43,19 @@ public class PSO {
     }
 
     public void AvaliarParticulas() {
+        double soma = 0;
         for (int i = 0; i < enxame.length; i++) {
             enxame[i].AvaliarParticula();
+            soma += enxame[i].getAvaliacao();
         }
+        mediaAvaliacoes.add(soma/enxame.length);
     }
+    
 
-    public List atualizaVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos) {
+    public List atualizaVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos, int tipoAtualizacaoVelocidade) {
         List<Double> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
 
-        direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].AtualizarVelocidade(c1, c2, gBest.getPosicao(), arcosSuperBasicos);
+        direcaoCaminhadaArcosSuperBasicos = enxame[indiceParticula].atualizaVelocidade(indiceParticula, c1, c2, gBest.getPosicao(), arcosSuperBasicos, tipoAtualizacaoVelocidade);
 
         return direcaoCaminhadaArcosSuperBasicos;
     }
@@ -69,28 +75,28 @@ public class PSO {
         }
     }
 
+
+
     public void ObterGbest() {
-        double gbestIteracao;
-        gbestIteracao = enxame[0].getpBest();
-        int posicaoGBest = 0;
-        // obter o melhor da iteracao
+        int gbestPosicao = 0;
         for (int i = 1; i < enxame.length; i++) {
-            if (gbestIteracao > enxame[i].getpBest()) {
-                posicaoGBest = i;
-                gbestIteracao = enxame[i].getpBest();
+            if (enxame[i].getAvaliacao() < enxame[gbestPosicao].getAvaliacao()) {
+                gbestPosicao = i;
             }
         }
 
-        if (gbestIteracao < gBest.getAvaliacao()) {
+        if (enxame[gbestPosicao].getAvaliacao() < gBest.getAvaliacao()) {
             ParticulaPSO novoGBest = new ParticulaPSO(numUsinas, numIntervalos, vazaoMinima, vazaoMaxima, volumeMinimo, vazaoMaxima, simulacaoHidroeletrica);
-            novoGBest.setPosicao(enxame[posicaoGBest].getPosicao());
-            novoGBest.setVelocidade(enxame[posicaoGBest].getPosicao());
-            novoGBest.setAvaliacao(enxame[posicaoGBest].getAvaliacao());
+            novoGBest.setPosicao(enxame[gbestPosicao].getPosicao());
+            novoGBest.setVelocidade(enxame[gbestPosicao].getVelocidade());
+            novoGBest.setAvaliacao(enxame[gbestPosicao].getAvaliacao());
             gBest = novoGBest;
         }
+        
+        avaliacoesGBest.add(gBest.getAvaliacao());
     }
-
-    public void ObterGbest2() {
+    
+    public void ObterGbest_EPA_TEC2() {
         int gbestPosicao = 0;
         for (int i = 1; i < enxame.length; i++) {
             if (enxame[i].getAvaliacao() < enxame[gbestPosicao].getAvaliacao()) {
@@ -107,6 +113,7 @@ public class PSO {
         }
     }
 
+    
     public double getC1() {
         return c1;
     }
@@ -217,5 +224,37 @@ public class PSO {
 
     public void setgBest(ParticulaPSO gBest) {
         this.gBest = gBest;
+    }
+
+    public List<Double> getMediaAvaliacoes() {
+        return mediaAvaliacoes;
+    }
+
+    public void setMediaAvaliacoes(List<Double> mediaAvaliacoes) {
+        this.mediaAvaliacoes = mediaAvaliacoes;
+    }
+
+    public List<Double> getAvaliacoesGBest() {
+        return avaliacoesGBest;
+    }
+
+    public void setAvaliacoesGBest(List<Double> avaliacoesGBest) {
+        this.avaliacoesGBest = avaliacoesGBest;
+    }
+    
+    public void imprimeMediaAvaliacoes(){
+        System.out.println("Média das Avaliações:");
+        for (int i = 0; i < mediaAvaliacoes.size(); i++) {
+            System.out.println(String.format("%.10f", mediaAvaliacoes.get(i)));
+        }
+        System.out.println();
+    }
+    
+    public void imprimeGBest(){
+        System.out.println("GBest em cada Iteração:");
+        for (int i = 0; i < avaliacoesGBest.size(); i++) {
+            System.out.println(String.format("%.10f", avaliacoesGBest.get(i)));
+        }
+        System.out.println();
     }
 }
