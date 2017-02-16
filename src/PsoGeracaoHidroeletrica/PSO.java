@@ -96,7 +96,7 @@ public class PSO {
         avaliacoesGBest.add(gBest.getAvaliacao());
     }
     
-    public void ObterGbest_EPA_TEC2() {
+    public void ObterGbest_EPA_TEC_Geral() {
         int gbestPosicao = 0;
         for (int i = 1; i < enxame.length; i++) {
             if (enxame[i].getAvaliacao() < enxame[gbestPosicao].getAvaliacao()) {
@@ -242,18 +242,23 @@ public class PSO {
         this.avaliacoesGBest = avaliacoesGBest;
     }
     
-    public void imprimeMediaAvaliacoes(){
-        System.out.println("Média das Avaliações:");
-        for (int i = 0; i < mediaAvaliacoes.size(); i++) {
-            System.out.println(String.format("%.10f", mediaAvaliacoes.get(i)));
-        }
-        System.out.println();
-    }
-    
-    public void imprimeGBest(){
+    public void imprimeResultadoFinal(){
+        System.out.println("Avaliação GBest = " + getgBest().getAvaliacao());
+        getgBest().imprimePosicaoFinal(volumeMaximo, volumeMinimo);
+        
+        getgBest().AvaliarParticula2();
+        System.out.println("Avaliação da Melhor Partícula = " + getgBest().getAvaliacao());
+        
+        getgBest().imprimeVolumes();
+        
         System.out.println("GBest em cada Iteração:");
         for (int i = 0; i < avaliacoesGBest.size(); i++) {
             System.out.println(String.format("%.10f", avaliacoesGBest.get(i)));
+        }
+        
+        System.out.println("\nMédia das Avaliações:");
+        for (int i = 0; i < mediaAvaliacoes.size(); i++) {
+            System.out.println(String.format("%.10f", mediaAvaliacoes.get(i)));
         }
         System.out.println();
     }
