@@ -127,7 +127,7 @@ public class CarregarSistema {
         Itaparica.getUsinaImediatamenteAMontante().add(Sobradinho);
 
         // afluencias
-        int numIntervalos = 60;
+        int numIntervalos = 24;
         double[][] afluencia = new double[numIntervalos][numUsina];
 
         // ---- tres marias

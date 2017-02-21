@@ -1187,7 +1187,7 @@ public class FluxoEmRede {
             esquerda = maior;
         }
         while((direita - esquerda) > limite ){
-            System.out.println("diferenca: " + (direita - esquerda));
+    //        System.out.println("diferenca: " + (direita - esquerda));
             direita = getMenorIntervaloCustoMarginal(esquerda, direita, IntervalosHorizonte);
         }
         intervalo[0] = esquerda;

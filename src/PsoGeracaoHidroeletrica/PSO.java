@@ -1,6 +1,8 @@
 package PsoGeracaoHidroeletrica;
 
 import fluxoemredes.Arco;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class PSO {
     private int numUsinas;
     private int numIntervalos;
     private ParticulaPSO gBest;
-    
+
     private List<Double> mediaAvaliacoes = new ArrayList<>();
     private List<Double> avaliacoesGBest = new ArrayList<>();
 
@@ -48,9 +50,8 @@ public class PSO {
             enxame[i].AvaliarParticula();
             soma += enxame[i].getAvaliacao();
         }
-        mediaAvaliacoes.add(soma/enxame.length);
+        mediaAvaliacoes.add(soma / enxame.length);
     }
-    
 
     public List atualizaVelocidade(int indiceParticula, List<Arco> arcosSuperBasicos, int tipoAtualizacaoVelocidade) {
         List<Double> direcaoCaminhadaArcosSuperBasicos = new ArrayList<>();
@@ -75,8 +76,6 @@ public class PSO {
         }
     }
 
-
-
     public void ObterGbest() {
         int gbestPosicao = 0;
         for (int i = 1; i < enxame.length; i++) {
@@ -92,10 +91,10 @@ public class PSO {
             novoGBest.setAvaliacao(enxame[gbestPosicao].getAvaliacao());
             gBest = novoGBest;
         }
-        
+
         avaliacoesGBest.add(gBest.getAvaliacao());
     }
-    
+
     public void ObterGbest_EPA_TEC_Geral() {
         int gbestPosicao = 0;
         for (int i = 1; i < enxame.length; i++) {
@@ -113,7 +112,6 @@ public class PSO {
         }
     }
 
-    
     public double getC1() {
         return c1;
     }
@@ -241,25 +239,81 @@ public class PSO {
     public void setAvaliacoesGBest(List<Double> avaliacoesGBest) {
         this.avaliacoesGBest = avaliacoesGBest;
     }
-    
-    public void imprimeResultadoFinal(){
+
+    public void imprimeResultadoFinal(String nomeArquivo) {
         System.out.println("Avaliação GBest = " + getgBest().getAvaliacao());
         getgBest().imprimePosicaoFinal(volumeMaximo, volumeMinimo);
-        
+
         getgBest().AvaliarParticula2();
         System.out.println("Avaliação da Melhor Partícula = " + getgBest().getAvaliacao());
-        
+
         getgBest().imprimeVolumes();
-        
+
         System.out.println("GBest em cada Iteração:");
         for (int i = 0; i < avaliacoesGBest.size(); i++) {
             System.out.println(String.format("%.10f", avaliacoesGBest.get(i)));
         }
-        
+
         System.out.println("\nMédia das Avaliações:");
         for (int i = 0; i < mediaAvaliacoes.size(); i++) {
             System.out.println(String.format("%.10f", mediaAvaliacoes.get(i)));
         }
         System.out.println();
+
+        gravarArquivoTXT(nomeArquivo);
+    }
+
+    public void gravarArquivoTXT(String nomeDoArquivo) {
+        try {
+            FileWriter arquivo = new FileWriter("C:/Artigo/" + nomeDoArquivo + ".txt");
+            PrintWriter gravarArquivo = new PrintWriter(arquivo);
+
+            gravarArquivo.printf("Resultado Otimização Fluxo em Rede e PSO%n");
+
+            gravarArquivo.printf("%nCusto Total da Operação:%n");
+            gravarArquivo.printf(String.format("%.10f", gBest.getAvaliacao()) + "%n");
+            
+            gravarArquivo.printf("%nGeração Hidráulica:%n");
+            for (int i = 0; i < numIntervalos; i++) {
+                gravarArquivo.printf(String.format("%.10f", getgBest().getSimulacao().getHorizontePlanejamento().getIntervalos().get(i).getGeracaoHidraulica()) + "%n");
+            }
+            
+            gravarArquivo.printf("%nComplementação Térmica:%n");
+            for (int i = 0; i < numIntervalos; i++) {
+                gravarArquivo.printf(String.format("%.10f", getgBest().getSimulacao().getHorizontePlanejamento().getIntervalos().get(i).getGeracaoComplementar()) + "%n");
+            }
+            
+            
+            gravarArquivo.printf("%nVolume Usina 1:%n");
+            for (int i = 0; i < gBest.getPosicao()[0].length / 2; i++) {
+                gravarArquivo.printf(String.format("%.10f", ((gBest.getPosicao()[0][i] - volumeMinimo[0]) / (volumeMaximo[0] - volumeMinimo[0]))) + "%n");
+            }
+            
+            gravarArquivo.printf("%nVolume Usina 2:%n");
+            for (int i = 0; i < gBest.getPosicao()[0].length / 2; i++) {
+                gravarArquivo.printf(String.format("%.10f", ((gBest.getPosicao()[1][i]) - volumeMinimo[1]) / (volumeMaximo[1] - volumeMinimo[1])) + "%n");
+            }
+
+            gravarArquivo.printf("%nVolume Usina 3:%n");
+            for (int i = 0; i < gBest.getPosicao()[0].length / 2; i++) {
+                gravarArquivo.printf(String.format("%.10f", ((gBest.getPosicao()[2][i] - volumeMinimo[2]) / (volumeMaximo[2] - volumeMinimo[2]))) + "%n");
+            }
+            
+            gravarArquivo.printf("%nGBest em cada Iteração:%n");
+            for (int i = 0; i < avaliacoesGBest.size(); i++) {
+                gravarArquivo.printf(String.format("%.10f", avaliacoesGBest.get(i)) + "%n");
+            }
+
+            gravarArquivo.printf("\nMédia das Avaliações:%n");
+            for (int i = 0; i < mediaAvaliacoes.size(); i++) {
+                gravarArquivo.printf(String.format("%.10f", mediaAvaliacoes.get(i))+ "%n");
+            }
+            System.out.println();
+
+            arquivo.close();
+            gravarArquivo.close();
+        } catch (Exception e) {
+            System.out.println("ERRO! \n" + e);
+        }
     }
 }

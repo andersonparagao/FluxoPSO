@@ -173,11 +173,11 @@ public class FluxoEmRedesPSO {
                         List<Double> direcaoCaminhadaSuperBasicos;
                         double[][] matrizFluxo;
                         if (iteracao < tipoEPA[1]) {
-                            int[] intervalo = fluxo.InvervaloEsquerdaDireitaEPATEC3(pso.getEnxame()[indiceParticula],12);
+                            int[] intervalo = fluxo.InvervaloEsquerdaDireitaEPATEC3(pso.getEnxame()[indiceParticula],6);
 //                            System.out.println(" intervalo esquerda: " + intervalo[0]);
 //                            System.out.println(" intervalo direita: " + intervalo[1]);
                             for (int i = intervalo[0]; i < intervalo[1]; i++) {
-                                for (int j = i + 1; j <= intervalo[1]; j++) {
+                                for (int j = i + 1; j < intervalo[1]; j++) { // mudei aqui tirei o <=
                                     superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC3(pso.getEnxame()[indiceParticula],i,j);
                                     direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].atualizaVelocidade(indiceParticula, pso.getC1(), pso.getC2(), pso.getgBest().getPosicao(), superBasicos, tipoAtualizacaoVelocidade);
                                     matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula], tipoPassoOtimo);
@@ -211,7 +211,7 @@ public class FluxoEmRedesPSO {
      */
     public static void main(String[] args) {
         //Definindo o sistema para a simulação/otimização
-        int numeroIntervalos = 60;
+        int numeroIntervalos = 24;
         int numeroUsinas = 3;
         double demanda = 4500;
 
@@ -234,69 +234,17 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 50;
-        int numeroIteracoes = 50;
-        double c1 = 2;
-        double c2 = 2;
+        int numeroParticulas = 2;
+        int numeroIteracoes = 2;
+        double c1 = 2.6;
+        double c2 = 2.6;
         PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
 
-        FluxoEmRedesPSO.executaOtimizacao(new int[]{4, 30}, 2, 1, pso, fluxo, numeroIteracoes);
+        FluxoEmRedesPSO.executaOtimizacao(new int[]{4, 25}, 2, 4, pso, fluxo, numeroIteracoes);
 
-        // exibindo a melhor Partícula
-        pso.imprimeResultadoFinal();
         
-//        for (int iteracao = 0; iteracao < numeroIteracoes; iteracao++) {
-//            soma = 0;
-//            System.out.println("== ITERACAO " + iteracao + " ==");
-//            for (int indiceParticula = 0; indiceParticula < pso.getEnxame().length; indiceParticula++) {
-//                pso.getEnxame()[indiceParticula].AvaliarParticula();
-//                soma = soma + pso.getEnxame()[indiceParticula].getAvaliacao();
-//            }
-//            mediaAvaliacoes.add(soma / numeroParticulas);
-//            pso.ObterGbest();
-//            avalicaoGBest.add(pso.getgBest().getAvaliacao());
-//            for (int indiceParticula = 0; indiceParticula < numeroParticulas; indiceParticula++) {
-//                //EPA-TEC
-//                if (iteracao < 15) {
-//                    //System.out.println("EPA-TEC todos");
-//                        for (int i = 0; i < numeroIntervalos - 1; i++) {
-//                            for (int j = i + 1; j < numeroIntervalos; j++) {
-//                                superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC2(pso.getEnxame()[indiceParticula], i, j);
-//                                direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
-//                                matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
-//                                pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
-//                                pso.getEnxame()[indiceParticula].AvaliarParticula();
-//                                pso.ObterGbest();
-//                            }
-//                        }
-//                }
-//                
-//                
-////                } else {
-////                    //System.out.println("EPA-TEC normal");
-////                    if (iteracao < numeroIteracoes / 2) {
-////                        superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC(pso.getEnxame()[indiceParticula]);
-////                        direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
-////                        matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
-////                        pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
-////                    } else {
-////                      //  System.out.println("EPA-TEU");
-////                        //EPA-TEU
-////                        superBasicos = new ArrayList<>();
-////                        direcaoCaminhadaSuperBasicos = new ArrayList<>();
-////                        for (int i = 0; i < numeroUsinas; i++) {
-////                            pso.getEnxame()[indiceParticula].AvaliarParticula();
-////                            Arco arco = fluxo.executaFluxoEmRedeParte1EPA_TEU(i, pso.getEnxame()[indiceParticula]);
-////                            superBasicos.add(arco);
-////                            direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].AtualizarVelocidade(c1, c2, pso.getgBest().getPosicao(), superBasicos);
-////                            matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula]);
-////                            pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
-////                            superBasicos.clear();
-////                        }
-////                    }
-////                }
-//            }
-//        }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // exibindo a melhor Partícula
+        pso.imprimeResultadoFinal("50 part 50 iteracaoes 25 epa3 25 epa4 razao aurea fator constricao 2.6 4");
+      
     }
 }

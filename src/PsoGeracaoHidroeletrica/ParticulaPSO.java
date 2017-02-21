@@ -84,9 +84,6 @@ public class ParticulaPSO {
     }
 
     public List AtualizarVelocidadeWellington(int indiceParticula, double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
-        //Random r = new Random();
-        //double r1 = r.nextDouble();
-        //double r2 = r.nextDouble();
         double avaliacaoAtual;
         int numUsinas = posicaoMin.length;
         int numIntervalos = posicao[0].length/2;
@@ -103,19 +100,13 @@ public class ParticulaPSO {
                     posicaoAproximacao[j][l] = posicao[j][l];
                 }
             }
-         //   System.out.println("Arco SuperBásico = " + arcosSuperBasicos.get(i).toString());
+
             if(linhaOrigem != linhaDestino){
-         //       System.out.println("defluencia");
-                //System.out.println("defluencia antes: " + posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos]);
                 posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos] = posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos] + 1 ;
-                //System.out.println("defluencia depois: " + posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos]);
                 simulacao.definirVolumesFinais(posicaoAproximacao, numUsinas, numIntervalos);
                 simulacao.definirVazoesDefluentes(posicaoAproximacao, numUsinas, numIntervalos);
                 double defluenciaposicao = posicao[linhaOrigem][colunaOrigem + numIntervalos] ;
                 double defluenciaAproximacao  = posicaoAproximacao[linhaOrigem][colunaOrigem + numIntervalos];
-                //System.out.println("defluencia antes: " + defluenciaposicao);
-                //System.out.println("defluencia depois: " + defluenciaAproximacao);
-                //System.out.println("avaliacao antes:  " + avaliacao);
                 double aval = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
                 simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
                 simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
@@ -129,11 +120,7 @@ public class ParticulaPSO {
                     Random r = new Random();
                     direcaoCaminhadaArcosSuperBasico.add(-1*(r.nextDouble())*(aval - avaliacaoAtual));
                 }
-                
-                //direcaoCaminhadaArcosSuperBasico.add(-1*(simulacao.simularOperacaoEnergeticaPSO(numIntervalos) - avaliacao));
             }else{
-                //posicaoAproximacao = posicao;
-           //     System.out.println("volume");
                 if(posicaoAproximacao[linhaOrigem][colunaOrigem]!=posicaoMax[linhaOrigem][0]){
                     posicaoAproximacao[linhaOrigem][colunaOrigem] = posicaoAproximacao[linhaOrigem][colunaOrigem] + 1;
                 }else{
@@ -141,23 +128,17 @@ public class ParticulaPSO {
                 }
                 simulacao.definirVolumesFinais(posicaoAproximacao, numUsinas, numIntervalos);
                 simulacao.definirVazoesDefluentes(posicaoAproximacao, numUsinas, numIntervalos);
-                //System.out.println("avaliacao antes:  " + avaliacao);
                 double aval = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
                 simulacao.definirVolumesFinais(posicao, numUsinas, numIntervalos);
                 simulacao.definirVazoesDefluentes(posicao, numUsinas, numIntervalos);
                 avaliacaoAtual = simulacao.simularOperacaoEnergeticaPSO(numIntervalos);
-                //System.out.println("avaliacao depois: " + aval);
-                //System.out.println("avaliacao atual: " + avaliacaoAtual);
-                //System.out.println("avaliacao depois: " + aval);
                 if(indiceParticula == 0){
                     direcaoCaminhadaArcosSuperBasico.add(-1*(aval - avaliacaoAtual));
                 } else {
                     Random r = new Random();
                     direcaoCaminhadaArcosSuperBasico.add(-1*(r.nextDouble())*(aval - avaliacaoAtual));
                 }
-                
             }
-            //System.out.println("direcao caminhada: " + direcaoCaminhadaArcosSuperBasico.get(i));
         }
         
         return direcaoCaminhadaArcosSuperBasico;
@@ -230,12 +211,13 @@ public class ParticulaPSO {
     }
     
     
+    
     public List AtualizarVelocidadeConstanteInercia(double c1, double c2, double[][] gBest, List<Arco> arcosSuperBasicos) {
         Random r = new Random();
         double r1 = r.nextDouble();
         double r2 = r.nextDouble();
         
-        double contanteInercia = 0.75;
+        double contanteInercia = 0.9;
         
         int numUsinas = posicaoMin.length;
         int numIntervalos = posicao[0].length/2;
@@ -467,16 +449,6 @@ public class ParticulaPSO {
     }
     
     
-    public void imprimePosicaoFinalNormalizada(){
-        System.out.println("POSICAO NORMALIZADA");
-        for (int i = 0; i < posicao.length; i++) {
-            System.out.println();
-            for (int j = 0; j < posicao[0].length; j++) {
-                System.out.println(String.format("%.10f", ((velocidadeMax[i][j] - posicao[i][j])/(velocidadeMax[i][j] - velocidadeMin[i][j]))));
-            }
-        }
-        System.out.println("\n");
-    }
     
     public void imprimeVolumes() {
         System.out.println("Partícula");
@@ -585,5 +557,14 @@ public class ParticulaPSO {
     public void setAvaliacao(double avaliacao) {
         this.avaliacao = avaliacao;
     }
+
+    public SimulacaoOperacaoEnergeticaPSO getSimulacao() {
+        return simulacao;
+    }
+
+    public void setSimulacao(SimulacaoOperacaoEnergeticaPSO simulacao) {
+        this.simulacao = simulacao;
+    }
+    
     
 }
