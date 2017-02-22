@@ -40,7 +40,7 @@ public class PSO {
         this.enxame = new ParticulaPSO[numeroParticulas];
         this.c1 = c1;
         this.c2 = c2;
-        gBest = new ParticulaPSO(numUsinas, numIntervalos, vazaoMinima, vazaoMaxima, volumeMinimo, vazaoMaxima, simulacaoHidroeletrica);
+        gBest = new ParticulaPSO(numUsinas, numIntervalos, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, simulacaoHidroeletrica);
         gBest.setAvaliacao(Double.MAX_VALUE);
     }
 

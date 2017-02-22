@@ -217,7 +217,7 @@ public class ParticulaPSO {
         double r1 = r.nextDouble();
         double r2 = r.nextDouble();
         
-        double contanteInercia = 0.9;
+        double contanteInercia = 0.85;
         
         int numUsinas = posicaoMin.length;
         int numIntervalos = posicao[0].length/2;

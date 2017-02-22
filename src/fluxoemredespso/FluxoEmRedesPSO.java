@@ -234,17 +234,17 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 2;
-        int numeroIteracoes = 2;
-        double c1 = 2.6;
-        double c2 = 2.6;
+        int numeroParticulas = 50;
+        int numeroIteracoes = 50;
+        double c1 = 2;
+        double c2 = 2;
         PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
 
-        FluxoEmRedesPSO.executaOtimizacao(new int[]{4, 25}, 2, 4, pso, fluxo, numeroIteracoes);
+        FluxoEmRedesPSO.executaOtimizacao(new int[]{4, 25}, 2, 3, pso, fluxo, numeroIteracoes);
 
         
         // exibindo a melhor Partícula
-        pso.imprimeResultadoFinal("50 part 50 iteracaoes 25 epa3 25 epa4 razao aurea fator constricao 2.6 4");
+        pso.imprimeResultadoFinal("50 part 50 iteracaoes 25 epa3 25 epa4 razao aurea constante de inércia 0.85 3");
       
     }
 }
