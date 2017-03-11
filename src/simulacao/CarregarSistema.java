@@ -387,7 +387,7 @@ public class CarregarSistema {
 		 * 
 		 * 
          */
-        int numIntervalos = 60;
+        int numIntervalos = 24;
         double[][] afluencia = new double[numIntervalos][numUsina];
 //Scanner ler = new Scanner(System.in);
 

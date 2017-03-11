@@ -130,6 +130,7 @@ public class FluxoEmRedesPSO {
                                     superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC2(pso.getEnxame()[indiceParticula], i, j);
                                     direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].atualizaVelocidade(indiceParticula, pso.getC1(), pso.getC2(), pso.getgBest().getPosicao(), superBasicos, tipoAtualizacaoVelocidade);
                                     matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula], tipoPassoOtimo);
+                                    pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
                                     pso.getEnxame()[indiceParticula].AvaliarParticula();
                                     pso.ObterGbest_EPA_TEC_Geral();
                                 }
@@ -141,6 +142,7 @@ public class FluxoEmRedesPSO {
                                 direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].atualizaVelocidade(indiceParticula, pso.getC1(), pso.getC2(), pso.getgBest().getPosicao(), superBasicos, tipoAtualizacaoVelocidade);
                                 matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula], tipoPassoOtimo);
                                 pso.getEnxame()[indiceParticula].AtualizarPosicao(matrizFluxo);
+                                superBasicos.clear();
                             } else {
                                 //EPA-TEU
                                 superBasicos = new ArrayList<>();
@@ -177,7 +179,7 @@ public class FluxoEmRedesPSO {
 //                            System.out.println(" intervalo esquerda: " + intervalo[0]);
 //                            System.out.println(" intervalo direita: " + intervalo[1]);
                             for (int i = intervalo[0]; i < intervalo[1]; i++) {
-                                for (int j = i + 1; j < intervalo[1]; j++) { // mudei aqui tirei o <=
+                                for (int j = i + 1; j <= intervalo[1]; j++) { 
                                     superBasicos = fluxo.executaFluxoEmRedeParte1EPA_TEC3(pso.getEnxame()[indiceParticula],i,j);
                                     direcaoCaminhadaSuperBasicos = pso.getEnxame()[indiceParticula].atualizaVelocidade(indiceParticula, pso.getC1(), pso.getC2(), pso.getgBest().getPosicao(), superBasicos, tipoAtualizacaoVelocidade);
                                     matrizFluxo = fluxo.executaFluxoEmRedeParte2(direcaoCaminhadaSuperBasicos, pso.getEnxame()[indiceParticula], tipoPassoOtimo);
@@ -209,7 +211,47 @@ public class FluxoEmRedesPSO {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//        //Definindo o sistema para a simulação/otimização
+//        int numeroIntervalos = 24;
+//        int numeroUsinas = 3;
+//        double demanda = 4500;
+//
+//        SimulacaoOperacaoEnergeticaPSO simulacao = new SimulacaoOperacaoEnergeticaPSO(numeroIntervalos, demanda);
+//        double[] vazaoMinima = {77, 254, 408};
+//        double[] vazaoMaxima = {1e20, 1e20, 1e20};
+//        double[] volumeMinimo = {4669, 4573, 7000};
+//        double[] volumeMaximo = {17190, 17027, 12540};
+//
+//        CarregarSistema carregar = new CarregarSistema();
+//        try {
+//            carregar.UsinasMinas(simulacao);
+//        } catch (Exception e) {
+//            System.out.println("Erro " + e);
+//        }
+//
+//        double[][] rede = new double[numeroUsinas][numeroIntervalos * 2];
+//
+//        // definindo o Fluxo em Rede 
+//        FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
+//
+//        // definindo o PSO
+//        int numeroParticulas = 50;
+//        int numeroIteracoes = 50;
+//        double c1 = 2;
+//        double c2 = 2;
+//        PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
+//
+//        FluxoEmRedesPSO.executaOtimizacao(new int[]{1, 25}, 1, 1, pso, fluxo, numeroIteracoes);
+//
+//        
+//        // exibindo a melhor Partícula
+//        pso.imprimeResultadoFinal("50 part 50 iteracaoes 25 epa3 25 epa4 razao aurea constante de inércia 0.85 3");
+//      
+//    }
+    
+    
+    public void ExecutaOtimizacaoAlgoritmo(int numeroParticulas, int numeroIteracoes, double c1_c2, int tipoEPA, int qtd1aEPA, int tipoPassoOtimo, int tipoVelocidade, String nomeArquivo) {
         //Definindo o sistema para a simulação/otimização
         int numeroIntervalos = 24;
         int numeroUsinas = 3;
@@ -234,17 +276,13 @@ public class FluxoEmRedesPSO {
         FluxoEmRede fluxo = new FluxoEmRede(numeroUsinas, numeroIntervalos, rede, volumeMinimo, volumeMaximo, vazaoMinima, vazaoMaxima, demanda);
 
         // definindo o PSO
-        int numeroParticulas = 50;
-        int numeroIteracoes = 50;
-        double c1 = 2;
-        double c2 = 2;
-        PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1, c2);
+        PSO pso = new PSO(simulacao, demanda, vazaoMinima, vazaoMaxima, volumeMinimo, volumeMaximo, numeroParticulas, numeroUsinas, numeroIntervalos, c1_c2, c1_c2);
 
-        FluxoEmRedesPSO.executaOtimizacao(new int[]{4, 25}, 2, 3, pso, fluxo, numeroIteracoes);
+        FluxoEmRedesPSO.executaOtimizacao(new int[]{tipoEPA, qtd1aEPA}, tipoPassoOtimo, tipoVelocidade, pso, fluxo, numeroIteracoes);
 
         
         // exibindo a melhor Partícula
-        pso.imprimeResultadoFinal("50 part 50 iteracaoes 25 epa3 25 epa4 razao aurea constante de inércia 0.85 3");
+        pso.imprimeResultadoFinal(nomeArquivo);
       
     }
 }
