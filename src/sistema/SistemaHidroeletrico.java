@@ -319,9 +319,7 @@ public class SistemaHidroeletrico {
 																					// verificar
 			nosIntervaloAtual[i].setLimiteMinimoGeracaoHidraulica(0);
 			nosIntervaloAtual[i].setGeracaoHIdraulicaMaximaContinua(GmaxCont);
-
 		}
-
 	}
 
 	public void LimitesVazaoTurbinada(NoHidroenergetico[] nosIntervaloAtual) {

@@ -416,7 +416,7 @@ public abstract class UsinaHidroeletrica {
         double delta_hl;
         double vazaodefluentedoAlgoritmo = paramvazaodefluenteu;
         double nivelmon = montante.obterValorPolinomio(x);
-        double niveljus = jusante.obterValorPolinomio(paramvazaodefluenteu);// verificar direito no codigo
+        double niveljus = jusante.obterValorPolinomio(paramvazaodefluenteu);
         int div = conjuntos.size();
         double[] hl_conj = new double[conjuntos.size()];
         double[] hl_conjnovo = new double[conjuntos.size()];
@@ -471,7 +471,6 @@ public abstract class UsinaHidroeletrica {
                 engolimentoAnterior = engolimentoMaximoAtual;
 
             }
-
 //			delta_hl=-1;
 //			
 //			for(int i=0; i<conjuntos.size();i++){
@@ -487,8 +486,7 @@ public abstract class UsinaHidroeletrica {
 //		
         } while (convergencia == false);
         return engolimentoMaximoAtual;
-    }
-//	
+    }	
 
     public double P_max() {
         double potenciaMaxima = 0;
@@ -519,7 +517,6 @@ public abstract class UsinaHidroeletrica {
                 - obter_perda_carga_hidraulica(vazaoDefluente, volume, K_pc, 2)) * vazaoTurbinada;
 
         return geracaoHidraulica;
-
     }
 
     public abstract double ProdutividadeMedia(double paramVolume, double paramVolumeMinimo);

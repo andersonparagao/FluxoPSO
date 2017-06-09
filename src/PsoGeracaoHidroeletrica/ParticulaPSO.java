@@ -566,5 +566,31 @@ public class ParticulaPSO {
         this.simulacao = simulacao;
     }
     
+    public double calculaRaioParticula(double[][] posicaoGbest){
+        double somatorio = 0;
+        double raio = 0;
+        for (int i = 0; i < posicaoGbest.length; i++) {
+            for (int j = 0; j < posicaoGbest[0].length; j++) {
+                somatorio += Math.pow((posicao[i][j] - posicaoGbest[i][j]), 2);
+            }
+        }
+        
+        raio = Math.sqrt(somatorio);
+        
+        return raio;
+    }
     
+    // método que calcula a distância euclidiana da partícula em relação ao gBest
+    public static double calculaDistanciaEuclidiana(double[][] posicao, double gBest[][]){
+        double somatorio = 0;
+
+        for (int i = 0; i < gBest.length; i++) {
+            for (int j = 0; j < gBest[0].length; j++) {
+                somatorio += Math.pow((posicao[i][j] - gBest[i][j]), 2);
+            }
+        }
+        
+        return Math.sqrt(somatorio);
+    }
+        
 }

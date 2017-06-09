@@ -387,7 +387,7 @@ public class CarregarSistema {
 		 * 
 		 * 
          */
-        int numIntervalos = 24;
+        int numIntervalos = 60;
         double[][] afluencia = new double[numIntervalos][numUsina];
 //Scanner ler = new Scanner(System.in);
 
@@ -402,7 +402,7 @@ public class CarregarSistema {
                 //System.out.printf("%s\n", linha); 
                 //System.out.println("i = "+ i);
 
-                afluencia[i][0] = 0.8*Double.parseDouble(linha);
+                afluencia[i][0] = Double.parseDouble(linha);
                 //System.out.println(vetor[i]);
                 i++;
 
@@ -423,7 +423,7 @@ public class CarregarSistema {
             while (i < numIntervalos) {
                 //System.out.printf("%s\n", linha); 
                 //System.out.println("i = "+ i);
-                afluencia[i][1] = 0.8*Double.parseDouble(linha);
+                afluencia[i][1] = Double.parseDouble(linha);
                 //System.out.println(vetor[i]);
                 i++;
 //                                                if(i==3)
@@ -445,7 +445,7 @@ public class CarregarSistema {
             while (i < numIntervalos) {
                 //System.out.printf("%s\n", linha); 
                 //System.out.println("i = "+ i);
-                afluencia[i][2] = 0.8*Double.parseDouble(linha);
+                afluencia[i][2] = Double.parseDouble(linha);
                 //System.out.println(vetor[i]);
                 i++;
 //                                                if(i==3)
@@ -460,7 +460,7 @@ public class CarregarSistema {
         //---- definindo as demandas
         double[] demanda = new double[numIntervalos];
         for (int i = 0; i < numIntervalos; i++) {
-            demanda[i] = 2500;
+            demanda[i] = 5152;
         }
 
         IntervaloDeHorizonte[] intervalos = new IntervaloDeHorizonte[numIntervalos];

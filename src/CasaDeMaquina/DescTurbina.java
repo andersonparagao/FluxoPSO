@@ -102,10 +102,12 @@ public class DescTurbina {
 public double Engolimento_max(double hl,double hef,double qef){
 	double qmax;
 		if(hl>=hef){
-			qmax=qef*(Math.pow(hl/hef, getAlfaHlMaior()));	
+//			qmax=qef*(Math.pow(hl/hef, getAlfaHlMaior()));	
+                        qmax=qef*(Math.pow(hl/hef, 0));	
 		}
 		else{
-		qmax=qef*(Math.pow(hl/hef,getAlfaHlMenor()));
+		//qmax=qef*(Math.pow(hl/hef,getAlfaHlMenor()));
+                qmax=qef*(Math.pow(hl/hef, 0));
 		}
 		
 		return qmax;
@@ -114,10 +116,12 @@ public double Engolimento_max(double hl,double hef,double qef){
 public double Potencia_max(double hl,double hef,double pef){
 	double pmax;
 		if(hl>=hef){
-			pmax=pef*(Math.pow(hl/hef, getBetaHlMaior()));	
+			//pmax=pef*(Math.pow(hl/hef, getBetaHlMaior()));	
+                        pmax=pef*(Math.pow(hl/hef, 0));	
 		}
 		else{
-		pmax=pef*(Math.pow(hl/hef,getBetaHlMenor()));
+		//pmax=pef*(Math.pow(hl/hef,getBetaHlMenor()));
+                pmax=pef*(Math.pow(hl/hef, 0));
 		}
 		
 		return pmax;

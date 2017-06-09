@@ -112,6 +112,19 @@ public class PSO {
         }
     }
 
+    public double obtemRaioMaximoEnxame(){
+        double raioMaximo = Double.MIN_VALUE; // só pra primeira iteração
+        double raioParticula = 0;
+        for (int i = 0; i < enxame.length; i++) {
+            raioParticula = enxame[i].calculaRaioParticula(gBest.getPosicao());
+            if(raioParticula > raioMaximo){
+                raioMaximo = raioParticula;
+            }
+        }
+        
+        return raioMaximo;
+    }
+    
     public double getC1() {
         return c1;
     }
